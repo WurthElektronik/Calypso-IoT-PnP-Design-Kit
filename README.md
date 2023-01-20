@@ -1,6 +1,6 @@
-#  How to setup the Calypso-Azure-IoT-design-kit to connect to Azure IoT Central
+#  How to create an end-to-end IoT application using the Calypso IoT design kit and Azure IoT Central
 
-The Calypso Azure IoT design kit comes pre-flashed and is ready-to-use out-of-the box. The following items are necessary to go through this process.
+The Calypso IoT design kit comes pre-flashed and is ready-to-use out-of-the box. The following items are necessary to go through this process.
 
 - The design kit with M0 Feather stacked with Calypso Wi-Fi FeatherWing, the Sensor FeatherWing and the OLED FeatherWing.
 
@@ -16,9 +16,9 @@ https://azure.microsoft.com/en-us/free/
 - The WE certificate generator tool. This can be downloaded from:
 https://www.we-online.com/certificategenerator
 
-## How to setup the Calypso Azure IoT plug and play design module
+## Quick start guide
 
-The brief description of the steps to be followed to setup the Calypso Azure IoT plug and play design module are summarized below:
+The brief description of the steps to be followed to setup the Calypso IoT plug and play design module are summarized below:
 ![Flowchart Kit](images/flowchart_Kit.jpg)
 
 **1. Create an IoT Central Application –** Sign in to Azure portal, and in IoT Central Application, on the Basics tab, complete the required fields and wait for the deployment of a new application on IoT central platform
@@ -27,7 +27,7 @@ The brief description of the steps to be followed to setup the Calypso Azure IoT
 
 **3.	Upload Root Certificate to IoT Central –** Once a new enrollment group is created, the root certificate in .pem format needs to be added to the group.
 
-**4.	Import IoT design kit into application -** The device template published for the Calypso Azure IoT design kit in Microsoft’s list of Plug and Play devices can be used, or any other template. After this, the IoT platform is ready to authenticate and automatically detect the devices of type "Calypso Azure IoT design kit"
+**4.	Import IoT design kit into application -** The device template published for the Calypso IoT design kit in Microsoft’s list of Plug and Play devices can be used, or any other template. After this, the IoT platform is ready to authenticate and automatically detect the devices of type "Calypso IoT design kit"
 
 **5.	 Configure the device –** A one-time configuration of the kit is done which enables connection to the desired Wi-Fi network and the previously created IoT central application. Connect to calypso device in access point mode and navigate to calypso.net/azure.html. There, upload the certificates created in the WE Certificate Generator tool.
 
@@ -169,7 +169,7 @@ In order to do this,
 
 ### Import the Calypso IoT design kit profile into your application
 
-The device template for the Calypso Azure IoT design kit is published in the Microsoft’s list of Plug and Play devices. This template needs to be imported to this IoT central application to enable automatic device and data detection. This can be done using the following steps.
+The device template for the Calypso IoT design kit is published in the Microsoft’s list of Plug and Play devices. This template needs to be imported to this IoT central application to enable automatic device and data detection. This can be done using the following steps.
    
 - Select the "Device templates" option in the main menu and click on "New".  
 
@@ -183,7 +183,7 @@ The device template for the Calypso Azure IoT design kit is published in the Mic
   
 ![Create Device Template](images/createdevtemplate.png)
    
-At this stage, the IoT platform is ready to authenticate and automatically detect the devices of type "Calypso Azure IoT design kit"       
+At this stage, the IoT platform is ready to authenticate and automatically detect the devices of type "Calypso IoT design kit"       
 
 ### Configure the device
           
