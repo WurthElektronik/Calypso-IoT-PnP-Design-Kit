@@ -1,6 +1,6 @@
 /**
  * \file
- * \brief API implementation for the Gateway of the WE IoT design kit.
+ * \brief API implementation for the device of the WE IoT design kit.
  *
  * \copyright (c) 2022 Würth Elektronik eiSos GmbH & Co. KG
  *
@@ -165,6 +165,9 @@ MrY=\n\
 #define STATUS_CLOUD_SUCCESS 204
 #define STATUS_TOO_MANY_REQUESTS 429
 
+#define CALYPSO_FIRMWARE_MIN_MAJOR_VERSION 2
+#define CALYPSO_FIRMWARE_MIN_MINOR_VERSION 2
+
   extern bool sensorsPresent;
   extern volatile unsigned long telemetrySendInterval;
   TypeSerial *Device_init(void *Debug, void *CalypsoSerial);
@@ -189,6 +192,7 @@ MrY=\n\
   void Device_processCloudMessage();
   bool Device_ConfigurationComplete();
   void Device_displaySensorData();
+  bool Device_isUpToDate();
 #ifdef __cplusplus
 }
 #endif

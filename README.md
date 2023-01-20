@@ -16,6 +16,8 @@ https://azure.microsoft.com/en-us/free/
 - The WE certificate generator tool. This can be downloaded from:
 https://www.we-online.com/certificategenerator
 
+:warning: Make sure that the Calypso FeatherWing has a Firmware version > v2.2.0. In case of older firmware version, upate the Calypso module Firmware.
+
 ## Quick start guide
 
 The brief description of the steps to be followed to setup the Calypso IoT plug and play design module are summarized below:
@@ -267,3 +269,8 @@ This device allows changing the frequency with which the sensor data is read and
 To update the send frequency, type in ""telemetrySendFrequency": "<Send frequency in seconds>" and click on "Send to device". This updates the device's send frequency on the device.
 
 ![Telemetry send frequency](images/devprop1.png)
+
+### Factory resetting the device
+
+In order to reset the device to factory state, press the "button C" once, then Press and hold "button C" till the following message is displayed on the screen, "Reset device to factory state". 
+This procedure resets the device to default state. Follow the device configuration process defined earlier to reconfigure the device.
