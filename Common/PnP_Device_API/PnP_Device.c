@@ -1,6 +1,6 @@
 /**
  * \file
- * \brief API implementation for the Gateway of the WE IoT design kit.
+ * \brief API implementation for the device of the WE IoT design kit.
  *
  * \copyright (c) 2022 Würth Elektronik eiSos GmbH & Co. KG
  *
@@ -101,7 +101,7 @@ static void Device_PublishSWVersion();
 static void Device_PublishSendInterval(uint16_t val, uint16_t ac, uint16_t av, char *ad);
 static void Device_PublishDirectCmdResponse(int status, int requestID);
 /**
- * @brief  Initialize all components of a gateway
+ * @brief  Initialize all components of a device
  * @param  Debug Debug port
  * @param  CalypsoSerial Calypso serial port
  * @retval Serial debug port
@@ -225,7 +225,7 @@ bool Device_ConfigurationComplete()
     }
     else
     {
-        SSerial_printf(SerialDebug, "Laoding config file failed\r\n");
+        SSerial_printf(SerialDebug, "Loading config file failed\r\n");
         return false;
     }
 
@@ -348,7 +348,7 @@ bool Device_isStatusOK()
 }
 
 /**
- * @brief  Check if the gateway is connected to the Wi-Fi network
+ * @brief  Check if the device is connected to the Wi-Fi network
  * @retval True if connected false otherwise
  */
 bool Device_isConnectedToWiFi()
@@ -362,7 +362,32 @@ bool Device_isConnectedToWiFi()
 }
 
 /**
- * @brief  Check if the gateway is provisioned
+ * @brief  Check if the device is up to date
+ * @retval True or false
+ */
+bool Device_isUpToDate()
+{
+    char versionStr[20];
+    const char dot[2] = ".";
+    char *majorVer, *minorVer;
+
+    strcpy(versionStr, calypso->firmwareVersion);
+
+    majorVer = strtok(versionStr, dot);
+    minorVer = strtok(NULL, dot);
+
+    if ((atoi(majorVer)) >= CALYPSO_FIRMWARE_MIN_MAJOR_VERSION)
+    {
+        if ((atoi(minorVer)) >= CALYPSO_FIRMWARE_MIN_MINOR_VERSION)
+        {
+            return true;
+        }
+    }
+    return false;
+}
+
+/**
+ * @brief  Check if the device is provisioned
  * @retval True if provisioned false otherwise
  */
 bool Device_isProvisioned()
@@ -538,7 +563,7 @@ void Device_configurationInProgress()
 }
 
 /**
- * @brief  Collect data from sensors connected to the gateway
+ * @brief  Collect data from sensors connected to the device
  * @retval None
  */
 void Device_readSensors()
@@ -634,7 +659,7 @@ bool Device_SubscribeToTopics()
 }
 
 /**
- * @brief  Publish gateway provision request
+ * @brief  Publish device provision request
  * @retval true if successful false otherwise
  */
 static bool Device_PublishRegReq()
@@ -660,7 +685,7 @@ static bool Device_PublishRegReq()
 }
 
 /**
- * @brief  Publish gateway provision request
+ * @brief  Publish device provision request
  * @param  OpertionID
  * @retval true if successful false otherwise
  */
@@ -706,7 +731,7 @@ static json_value *Device_GetCloudResponse()
 }
 
 /**
- * @brief  Publish the values of sensors connected to the gateway
+ * @brief  Publish the values of sensors connected to the device
  * @retval None
  */
 void Device_PublishSensorData()
@@ -864,7 +889,7 @@ static void Device_PublishMACAddress()
 }
 
 /**
- * @brief  Publish the values of sensors connected to the gateway
+ * @brief  Publish the values of sensors connected to the device
  * @retval None
  */
 void Device_PublishProperties()

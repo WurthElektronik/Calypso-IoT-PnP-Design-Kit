@@ -1,6 +1,6 @@
-#  How to setup the Calypso-Azure-IoT-design-kit to connect to Azure IoT Central
+#  How to create an end-to-end IoT application using the Calypso IoT design kit and Azure IoT Central
 
-The Calypso Azure IoT design kit comes pre-flashed and is ready-to-use out-of-the box. The following items are necessary to go through this process.
+The Calypso IoT design kit comes pre-flashed and is ready-to-use out-of-the box. The following items are necessary to go through this process.
 
 - The design kit with M0 Feather stacked with Calypso Wi-Fi FeatherWing, the Sensor FeatherWing and the OLED FeatherWing.
 
@@ -16,9 +16,11 @@ https://azure.microsoft.com/en-us/free/
 - The WE certificate generator tool. This can be downloaded from:
 https://www.we-online.com/certificategenerator
 
-## How to setup the Calypso Azure IoT plug and play design module
+:warning: Make sure that the Calypso FeatherWing has a Firmware version > v2.2.0. In case of older firmware version, upate the Calypso module Firmware.
 
-The brief description of the steps to be followed to setup the Calypso Azure IoT plug and play design module are summarized below:
+## Quick start guide
+
+The brief description of the steps to be followed to setup the Calypso IoT plug and play design module are summarized below:
 ![Flowchart Kit](images/flowchart_Kit.jpg)
 
 **1. Create an IoT Central Application –** Sign in to Azure portal, and in IoT Central Application, on the Basics tab, complete the required fields and wait for the deployment of a new application on IoT central platform
@@ -27,7 +29,7 @@ The brief description of the steps to be followed to setup the Calypso Azure IoT
 
 **3.	Upload Root Certificate to IoT Central –** Once a new enrollment group is created, the root certificate in .pem format needs to be added to the group.
 
-**4.	Import IoT design kit into application -** The device template published for the Calypso Azure IoT design kit in Microsoft’s list of Plug and Play devices can be used, or any other template. After this, the IoT platform is ready to authenticate and automatically detect the devices of type "Calypso Azure IoT design kit"
+**4.	Import IoT design kit into application -** The device template published for the Calypso IoT design kit in Microsoft’s list of Plug and Play devices can be used, or any other template. After this, the IoT platform is ready to authenticate and automatically detect the devices of type "Calypso IoT design kit"
 
 **5.	 Configure the device –** A one-time configuration of the kit is done which enables connection to the desired Wi-Fi network and the previously created IoT central application. Connect to calypso device in access point mode and navigate to calypso.net/azure.html. There, upload the certificates created in the WE Certificate Generator tool.
 
@@ -169,7 +171,7 @@ In order to do this,
 
 ### Import the Calypso IoT design kit profile into your application
 
-The device template for the Calypso Azure IoT design kit is published in the Microsoft’s list of Plug and Play devices. This template needs to be imported to this IoT central application to enable automatic device and data detection. This can be done using the following steps.
+The device template for the Calypso IoT design kit is published in the Microsoft’s list of Plug and Play devices. This template needs to be imported to this IoT central application to enable automatic device and data detection. This can be done using the following steps.
    
 - Select the "Device templates" option in the main menu and click on "New".  
 
@@ -183,7 +185,7 @@ The device template for the Calypso Azure IoT design kit is published in the Mic
   
 ![Create Device Template](images/createdevtemplate.png)
    
-At this stage, the IoT platform is ready to authenticate and automatically detect the devices of type "Calypso Azure IoT design kit"       
+At this stage, the IoT platform is ready to authenticate and automatically detect the devices of type "Calypso IoT design kit"       
 
 ### Configure the device
           
@@ -267,3 +269,8 @@ This device allows changing the frequency with which the sensor data is read and
 To update the send frequency, type in ""telemetrySendFrequency": "<Send frequency in seconds>" and click on "Send to device". This updates the device's send frequency on the device.
 
 ![Telemetry send frequency](images/devprop1.png)
+
+### Factory resetting the device
+
+In order to reset the device to factory state, press the "button C" once, then Press and hold "button C" till the following message is displayed on the screen, "Reset device to factory state". 
+This procedure resets the device to default state. Follow the device configuration process defined earlier to reconfigure the device.

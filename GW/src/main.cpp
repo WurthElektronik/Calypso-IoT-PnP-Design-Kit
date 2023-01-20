@@ -32,6 +32,7 @@ TypeSerial *Debug;
 
 enum
 {
+    invalidFirmwareVersion,
     waitingForConfig,
     configuringDevice,
     provisioning,
@@ -89,35 +90,42 @@ void setup()
     /*Initialize the Neo-pixel LED*/
     neopixelInit();
     neopixelSet(NEO_PIXEL_RED);
+    if (Device_isUpToDate())
+    {
 
-    /*Check if the device is connected to Wi-Fi and has the config file*/
-    if ((!Device_isConnectedToWiFi()) || (!Device_isConfigured()))
-    {
-        statusFlag = waitingForConfig;
-        SSerial_printf(Debug, "Waiting for a device configuration...\r\n");
-        SSerial_printf(Debug, "Push the button C twice to enter configuration mode\r\n");
-        sprintf(displayText, "Device not configured\r\n\r\nTo configure\r\n\r\ndouble press\r\n\r\n<- button C");
-        SH1107_Display(1, 0, 0, displayText);
-        neopixelSet(NEO_PIXEL_RED);
-    }
-    else
-    {
-        /*Check if the device is provisioned in the cloud*/
-        if (Device_isProvisioned() == true)
+        /*Check if the device is connected to Wi-Fi and has the config file*/
+        if ((!Device_isConnectedToWiFi()) || (!Device_isConfigured()))
         {
-            /*Connect to IoT hub directly*/
-            SSerial_printf(Debug, "Device is provisioned\r\n");
-            sprintf(displayText, "Device is provisioned");
-            SH1107_Display(1, 0, 24, displayText);
-            statusFlag = connectingToCloud;
+            statusFlag = waitingForConfig;
+            SSerial_printf(Debug, "Waiting for a device configuration...\r\n");
+            SSerial_printf(Debug, "Push the button C twice to enter configuration mode\r\n");
+            sprintf(displayText, "Device not configured\r\n\r\nTo configure\r\n\r\ndouble press\r\n\r\n<- button C");
+            SH1107_Display(1, 0, 0, displayText);
+            neopixelSet(NEO_PIXEL_RED);
         }
         else
         {
-            /*Start provisioning*/
-            sprintf(displayText, "Provisioning in Progress...");
-            SH1107_Display(1, 0, 24, displayText);
-            statusFlag = provisioning;
+            /*Check if the device is provisioned in the cloud*/
+            if (Device_isProvisioned() == true)
+            {
+                /*Connect to IoT hub directly*/
+                SSerial_printf(Debug, "Device is provisioned\r\n");
+                sprintf(displayText, "Device is provisioned");
+                SH1107_Display(1, 0, 24, displayText);
+                statusFlag = connectingToCloud;
+            }
+            else
+            {
+                /*Start provisioning*/
+                sprintf(displayText, "Provisioning in Progress...");
+                SH1107_Display(1, 0, 24, displayText);
+                statusFlag = provisioning;
+            }
         }
+    }
+    else
+    {
+        statusFlag = invalidFirmwareVersion;
     }
 }
 
@@ -125,6 +133,17 @@ void loop()
 {
     switch (statusFlag)
     {
+    case invalidFirmwareVersion:
+    {
+        neopixelSet(NEO_PIXEL_RED);
+        /*The kit requires a minimum software version on Calypso*/
+        SSerial_printf(Debug, "Older firmware detected\r\n");
+        sprintf(displayText, "Calypso Firmware old \r\n\r\nUpdate Calypso");
+        SH1107_Display(1, 0, 16, displayText);
+        delay(5000);
+        break;
+    }
+    break;
     case waitingForConfig:
         /*Waiting on button press from the user*/
         break;
