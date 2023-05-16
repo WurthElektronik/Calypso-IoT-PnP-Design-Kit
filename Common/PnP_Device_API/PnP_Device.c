@@ -412,8 +412,11 @@ bool Device_isConfigured()
 bool Device_provision()
 {
     bool ret = false;
+    const char equals[2] = "=";
+    char *retryAfter;
+    int retryAfterSec = 0;
     strcpy(calypso->settings.mqttSettings.clientID, kitID);
-    sprintf(calypso->settings.mqttSettings.userOptions.userName, "%s/registrations/%s/api-version=2019-03-31&model-Id=%s", scopeID, kitID, modelID);
+    sprintf(calypso->settings.mqttSettings.userOptions.userName, "%s/registrations/%s/api-version=2021-06-01&model-id=%s", scopeID, kitID, modelID);
     strcpy(calypso->settings.mqttSettings.serverInfo.address, dpsServerAddress);
 
     if (!Calypso_fileExists(calypso, ROOT_CA_PATH))
@@ -442,15 +445,13 @@ bool Device_provision()
 
     if (Calypso_MQTTconnect(calypso) == false)
     {
-        if (calypso->status == calypso_MQTT_wrong_root_ca)
-        {
-            Calypso_MQTTDisconnect(calypso);
-            /*New root CA is not yet active*/
-            // Set the root CA path to the old root CA
-            strcpy(calypso->settings.mqttSettings.secParams.CAFile, ROOT_CA_PATH);
-            /*Retry connection to MQTT*/
-            Calypso_MQTTconnect(calypso);
-        }
+
+        Calypso_MQTTDisconnect(calypso);
+        /*New root CA is not yet active*/
+        // Set the root CA path to the old root CA
+        strcpy(calypso->settings.mqttSettings.secParams.CAFile, ROOT_CA_PATH);
+        /*Retry connection to MQTT*/
+        Calypso_MQTTconnect(calypso);
     }
 
     if (calypso->status == calypso_MQTT_connected)
@@ -472,14 +473,29 @@ bool Device_provision()
             bool provDone = false;
             if (provResponse != NULL)
             {
-                SSerial_printf(SerialDebug, "%s\r\n", provResponse->u.object.values[0].value->u.string.ptr);
-
+                strtok(calypso->topicName.data, equals);
+                strtok(NULL, equals);
+                retryAfter = strtok(NULL, equals);
+                retryAfterSec = atoi(retryAfter);
                 while (!provDone)
                 {
+                    if ((retryAfterSec > 1) && (retryAfterSec < 10))
+                    {
+                        SSerial_printf(SerialDebug, "Retry after %is\r\n", atoi(retryAfter));
+                        delay(atoi(retryAfter) * 1000);
+                    }
+                    else
+                    {
+                        SSerial_printf(SerialDebug, "5s\r\n");
+                        delay(5000);
+                    }
+
                     Device_PublishProvStatusReq(provResponse->u.object.values[0].value->u.string.ptr);
                     json_value *provResponse = Device_GetCloudResponse();
                     SSerial_printf(SerialDebug, "%s\r\n", provResponse->u.object.values[1].value->u.string.ptr);
-                    delay(1000);
+                    strtok(calypso->topicName.data, equals);
+                    strtok(NULL, equals);
+                    retryAfter = strtok(NULL, equals);
                     if (0 == strncmp(provResponse->u.object.values[1].value->u.string.ptr, "assigned", strlen("assigned")))
                     {
                         provDone = true;
@@ -492,6 +508,14 @@ bool Device_provision()
                             SH1107_Display(1, 0, 24, displayText);
                             SSerial_printf(SerialDebug, "Provisioning done: Connect to IoT hub %s\r\n", iotHubAddress);
                         }
+                    }
+                    else if (0 == strncmp(provResponse->u.object.values[1].value->u.string.ptr, "failed", strlen("failed")))
+                    {
+                        provDone = true;
+                        ret = false;
+                        sprintf(displayText, "Provisioning failed");
+                        SH1107_Display(1, 0, 24, displayText);
+                        SSerial_printf(SerialDebug, "Provisioning failed\r\n");
                     }
                 }
 
@@ -596,7 +620,7 @@ void Device_readSensors()
 void Device_MQTTConnect()
 {
     strcpy(calypso->settings.mqttSettings.clientID, kitID);
-    sprintf(calypso->settings.mqttSettings.userOptions.userName, "%s/%s/?api-version=2021-04-12", iotHubAddress, kitID);
+    sprintf(calypso->settings.mqttSettings.userOptions.userName, "%s/%s/?api-version=2021-04-12&model-id=%s", iotHubAddress, kitID, modelID);
     strcpy(calypso->settings.mqttSettings.serverInfo.address, iotHubAddress);
     if (Calypso_MQTTconnect(calypso) == false)
     {
@@ -805,7 +829,7 @@ static void Device_PublishSWVersion()
     json_object_push(fwVersion, "__t", json_string_new("c"));
     json_object_push(fwVersion, "swVersion", json_string_new(calypso->firmwareVersion));
     json_value *payload = json_object_new(1);
-    json_object_push(payload, "Calypso", fwVersion);
+    json_object_push(payload, "calypso", fwVersion);
     memset(sensorPayload, 0, MAX_PAYLOAD_LENGTH);
     json_serialize(sensorPayload, payload);
     json_builder_free(payload);
@@ -831,10 +855,10 @@ static void Device_PublishUDID()
 {
     json_value *jsonUdid = json_object_new(2);
     json_object_push(jsonUdid, "__t", json_string_new("c"));
-    json_object_push(jsonUdid, "UDID", json_string_new(calypso->udid));
+    json_object_push(jsonUdid, "udid", json_string_new(calypso->udid));
 
     json_value *payload = json_object_new(1);
-    json_object_push(payload, "Calypso", jsonUdid);
+    json_object_push(payload, "calypso", jsonUdid);
     memset(sensorPayload, 0, MAX_PAYLOAD_LENGTH);
     json_serialize(sensorPayload, payload);
     json_builder_free(payload);
@@ -860,10 +884,10 @@ static void Device_PublishMACAddress()
 {
     json_value *macAddr = json_object_new(2);
     json_object_push(macAddr, "__t", json_string_new("c"));
-    json_object_push(macAddr, "MACAddress", json_string_new(calypso->MAC_ADDR));
+    json_object_push(macAddr, "macAddress", json_string_new(calypso->MAC_ADDR));
 
     json_value *payload = json_object_new(1);
-    json_object_push(payload, "Calypso", macAddr);
+    json_object_push(payload, "calypso", macAddr);
     memset(sensorPayload, 0, MAX_PAYLOAD_LENGTH);
     json_serialize(sensorPayload, payload);
     json_builder_free(payload);
@@ -981,21 +1005,32 @@ void Device_processCloudMessage()
             unsigned long desiredVal = 0;
             uint16_t version = 0;
             /*Received response for the properties get request*/
-            desiredVal = (unsigned long)cloudResponse->u.object.values[0].value->u.object.values[0].value->u.integer;
-            version = (uint16_t)cloudResponse->u.object.values[0].value->u.object.values[1].value->u.integer;
-            if ((desiredVal > MAX_TELEMETRY_SEND_INTERVAL) || (desiredVal < MIN_TELEMETRY_SEND_INTERVAL))
+            if (0 == strncmp(cloudResponse->u.object.values[0].value->u.object.values[0].name, "telemetrySendFrequency", strlen("telemetrySendFrequency")))
             {
-                // value out of range, send response
-                Device_PublishSendInterval(desiredVal, STATUS_BAD_REQUEST, version, "invalid parameter");
+                desiredVal = (unsigned long)cloudResponse->u.object.values[0].value->u.object.values[0].value->u.integer;
+                version = (unsigned long)cloudResponse->u.object.values[0].value->u.object.values[1].value->u.integer;
+                /*Defualt value set by the cloud */
+                if ((desiredVal > MAX_TELEMETRY_SEND_INTERVAL) || (desiredVal < MIN_TELEMETRY_SEND_INTERVAL))
+                {
+                    // value out of range, send response
+                    Device_PublishSendInterval(desiredVal, STATUS_BAD_REQUEST, version, "invalid parameter");
+                }
+                else
+                {
+                    // set the value
+                    telemetrySendInterval = desiredVal * 1000;
+                    Device_PublishSendInterval(desiredVal, STATUS_SUCCESS, version, "success");
+
+                    sprintf(displayText, "Property updated\r\nsend interval: %lu s", desiredVal);
+                    SH1107_Display(1, 0, 24, displayText);
+                }
             }
             else
             {
-                // set the value
-                telemetrySendInterval = desiredVal * 1000;
-                Device_PublishSendInterval(desiredVal, STATUS_SUCCESS, version, "success");
-
-                sprintf(displayText, "Property updated\r\nsend interval: %lu s", desiredVal);
-                SH1107_Display(1, 0, 24, displayText);
+                /*No default value available, setting the value from the device*/
+                version = (unsigned long)0;
+                desiredVal = (unsigned long)DEFAULT_TELEMETRY_SEND_INTEVAL;
+                Device_PublishSendInterval(desiredVal, STATUS_SET_BY_DEV, version, "initialize");
             }
         }
         else

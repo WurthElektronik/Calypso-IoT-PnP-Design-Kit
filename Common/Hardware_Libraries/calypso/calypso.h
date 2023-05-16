@@ -280,7 +280,7 @@ extern "C"
 
     typedef struct ATMQTT_userOptions_t
     {
-        char userName[256];
+        char userName[512];
         char passWord[256];
     } ATMQTT_userOptions_t;
 
