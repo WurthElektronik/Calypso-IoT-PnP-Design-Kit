@@ -1,5 +1,5 @@
-#  How to create an end-to-end IoT application using the Calypso IoT design kit and Azure IoT Central
-
+#  How to create an demo IoT application using the Calypso IoT design kit with Azure IoT Central?
+## **Prerequisites**
 The Calypso IoT design kit comes pre-flashed and is ready-to-use out-of-the box. The following items are necessary to go through this process.
 
 - The design kit with M0 Feather stacked with Calypso Wi-Fi FeatherWing, the Sensor FeatherWing and the OLED FeatherWing.
@@ -18,70 +18,67 @@ https://www.we-online.com/certificategenerator
 
 :warning: Make sure that the Calypso FeatherWing has a Firmware version > v2.2.0. In case of older firmware version, upate the Calypso module Firmware.
 
-## Quick start guide
+## **Quick start guide**
 
 The brief description of the steps to be followed to setup the Calypso IoT plug and play design module are summarized below:
-![Flowchart Kit](images/flowchart_Kit.jpg)
 
 **1. Create an IoT Central Application –** Sign in to Azure portal, and in IoT Central Application, on the Basics tab, complete the required fields and wait for the deployment of a new application on IoT central platform
 
-**2.	Create Certificates on WE certificate generator tool –** Install the WE certificate generator tool and  configure the device and create device root certificate, device certificate & device private key. Then export all the files
+**2.	Create deivce config files –** Install the WE certificate generator tool. Enter basic device configuration such as Wi-Fi credentials. Create device root certificate, device certificate & device private key. Then export all the files.
 
 **3.	Upload Root Certificate to IoT Central –** Once a new enrollment group is created, the root certificate in .pem format needs to be added to the group.
 
-**4.	Import IoT design kit into application -** The device template published for the Calypso IoT design kit in Microsoft’s list of Plug and Play devices can be used, or any other template. After this, the IoT platform is ready to authenticate and automatically detect the devices of type "Calypso IoT design kit"
+**4.	 Configure the device –** A one-time configuration of the kit is done which enables connection to the desired Wi-Fi network and the previously created IoT central application. Connect to calypso device in access point mode and navigate to calypso.net/azure.html. There, upload the certificates created in the WE Certificate Generator tool.
 
-**5.	 Configure the device –** A one-time configuration of the kit is done which enables connection to the desired Wi-Fi network and the previously created IoT central application. Connect to calypso device in access point mode and navigate to calypso.net/azure.html. There, upload the certificates created in the WE Certificate Generator tool.
+**5. Connect the device to IoT central -** Once the device is configured, on first boot-up, the device automatically connects to the IoT central application. Access the device on the IoT platform and verify the telemetry data.
 
-**6. View Device Dashboard on IoT Platform -** Access the device on the IoT platform and verify the telemetry data
+## **Creating an IoT central application**
 
-### Create an IoT central application
+ a.	Sign in to the Azure portal, https://portal.azure.com/
 
- - a.	Sign in to the Azure portal, https://portal.azure.com/
+ b. From the Azure homepage, select the "+ Create a resource button" and then enter "IoT Central application" in the Search the Marketplace field. 
 
- - b.	 From the Azure homepage, select the "+ Create a resource button" and then enter "IoT Central application" in the Search the Marketplace field. 
-
- - c.	Select "IoT Central application" from the search results and the select "Create".
+ c.	Select "IoT Central application" from the search results and the select "Create".
 
 ![Create IoT Central](images/createiotcertral.PNG)
 
 On the Basics tab, complete the fields as follows: 
 
- - a. **Subscription**: Select the subscription to use for the application.
+ a. **Subscription**: Select the subscription to use for the application.
 
- - b.	**Resource group:** Select a resource group or create a new one. To create a new one, select Create new and fill in the name you want to use. To use an existing re source group, select that resource group. For more information, see Manage Azure Resource Manager resource groups.
+ b.	**Resource group:** Select a resource group or create a new one. To create a new one, select Create new and fill in the name you want to use. To use an existing re source group, select that resource group. For more information, see Manage Azure Resource Manager resource groups.
 
- - c.	**Resource name**: Type in a name for the IoT central application.
+ c.	**Resource name**: Type in a name for the IoT central application.
 
- - d.	**Application URL**: This will be automatically set to (azureiotcentral.com)
+ d.	**Application URL**: This will be automatically set to (azureiotcentral.com)
 
- - e.	**Template**: From the drop down, select "Custom application".
+ e.	**Template**: From the drop down, select "Custom application".
 
- - f.	**Region**: Select the region in which the application will be located. Select a location that is geographically the closest.
+ f.	**Region**: Select the region in which the application will be located. Select a location that is geographically the closest.
 
- - g.	**Pricing Plan**: Choose the appropriate pricing tier. The standard tier 0 is good to start prototyping. More details on pricing can be found at, https://azure.microsoft.com/en-us/pricing/details/iot-central
+ g.	**Pricing Plan**: Choose the appropriate pricing tier. The standard tier 0 is good to start prototyping. More details on pricing can be found at, https://azure.microsoft.com/en-us/pricing/details/iot-central
   
- - h.	Click on **"Review + Create"**. 
+ h.	Click on **"Review + Create"**. 
   
 ![Create Basic](images/createbasic.PNG)
 
- - i.	On the following page, review the terms and click on **"Create"**. 
+ i.	On the following page, review the terms and click on **"Create"**. 
   
- - j.	Wait for the deployment to complete. After the process is complete, click on "Go to resource" button to open the application. 
+ j.	Wait for the deployment to complete. After the process is complete, click on "Go to resource" button to open the application. 
  
  ![Deployment Complete](images/depComplete.PNG)
   
- - k.	Click on the IoT central application URL to open the newly created IoT central platform.
+ k.	Click on the IoT central application URL to open the newly created IoT central platform.
  
   ![Application URL](images/appurl.PNG)
   
- - l.	In the IoT central app open, "Permissions > Device connection groups" and note down the ID scope parameter for use in further steps.
+ l.	In the IoT central app open, "Permissions > Device connection groups" and note down the ID scope parameter for use in further steps.
 
 ![Home](images/home.png)
 
 ![ID Scope](images/idscope.PNG)
 
-### Create certificates
+## **Create device configuration files**
 
 In order to securely connect the device to IoT central application, the device needs to implement certain methods for authentication. In this case, the X.509 certificate based authentication is implemented. This method requires creation of certificates for every device. In order to enable easy prototyping, Würth Elektronik eiSos’s Certificate creation tool can be used. This tool creates all the certificates necessary to get started.
 
@@ -105,7 +102,7 @@ Inside the WE Certificate Generator tool, fill in the following fields to genera
 
 ![Certificate Generator Tool_Create Config File](images/certGen_createcfgfile.PNG)
 
-####	Device root certificate:
+###	**Device root certificate:**
 This is the self-signed certificate that acts as the root of trust for all devices. The device root certificate is used to generate leaf certificates. Each device has a unique leaf certificate that identifies the device. The root certificate can be generated once and used for generating leaf certificates for several devices. This tool allows creation of a new root certificate, saving the same and loading it back for subsequent usage. 
 1. On first time use, set the validity time in months 
 
@@ -121,7 +118,7 @@ This is the self-signed certificate that acts as the root of trust for all devic
 
 ![Device Root Certificate](images/deviceroot.png)
 
-####	Device certificate:
+###	**Device certificate:**
 Every device requires a unique device certificate to securely connect to the IoT central application. Each device certificate generated is exclusively linked to the device through the device ID and cannot be used on any other device. 
 1. For every device ID, set the validity time in months. 
 2. Click on "Create device certificate" to create a new device certificate
@@ -130,7 +127,7 @@ Every device requires a unique device certificate to securely connect to the IoT
 
 ![Device Certificate](images/devicecert.png)
 
-####	Device private key:
+###	**Device private key:**
 This is the private key corresponding to the public key in the device certificate and is also uniquely linked to a device ID. Click on "Export device key" to export the key in PEM format. This file needs to be uploaded to the device as will be explained in the subsequent sections.
 ![Device Key](images/devicekey.png) 
 
@@ -138,13 +135,13 @@ After completing the processes of generating the root and device certificates, e
        
 ![Certificate Generator Tool Steps](images/certgenstep.PNG)
 
-#### Certificates Generated in the output directory:
+### **Certificates Generated in the output directory:**
 After exporting all the necessary files, a new directory will be created in the same folder as the executable file with all the necessary configuration file and certificates.
   ![Azure Device Certificate](images/azdevcert.PNG) 
   
-### Upload the Root certificate to IoT central
+## **Upload the Root certificate to IoT central**
     
-In this step, the device root certificate is uploaded and a policy is set to allow all devices with leaf certificate that are generated from this root to be allowed to connect to the platform.
+In this step, the device root certificate is uploaded and a policy is set to allow all devices with leaf certificate that are generated from this root to connect to the platform.
     
   - In the IoT central app open, "Permissions > Device connection groups" and click on "+New"
   
@@ -168,26 +165,8 @@ In order to do this,
   * e. On completion of the upload process, close the pop-up window.
   
 ![Manage Certificate](images/managecert.png)
-
-### Import the Calypso IoT design kit profile into your application
-
-The device template for the Calypso IoT design kit is published in the Microsoft’s list of Plug and Play devices. This template needs to be imported to this IoT central application to enable automatic device and data detection. This can be done using the following steps.
-   
-- Select the "Device templates" option in the main menu and click on "New".  
-
-![New Device Template](images/newdevtemplate.png)
-   
-- In the subsequent window, scroll down the list of all available devices to find "Calypso IoT design kit". Select this and click on "Review".
-      
-![Select Calypso](images/selectcalypso.png)
-   
-- Add the device by clicking on "Create" button.
-  
-![Create Device Template](images/createdevtemplate.png)
-   
-At this stage, the IoT platform is ready to authenticate and automatically detect the devices of type "Calypso IoT design kit"       
-
-### Configure the device
+    
+## **Configure the device**
           
 The IoT design kit comes with the Firmware pre-installed. In this step, a one-time configuration of the kit is done which enables connection to the desired Wi-Fi network and the previously created IoT central application
           
@@ -205,41 +184,41 @@ The IoT design kit comes with the Firmware pre-installed. In this step, a one-ti
               
 - In the configuration mode, perform the following five steps,
 
-  - a. In the configuration mode, the Calypso Wi-Fi module is set to access point mode with an SSID "calypso_<MAC_ADDRESS>". Connect your PC (Laptop/tablet/smartphone) to this access point, displayed on the screen.
+  a. In the configuration mode, the Calypso Wi-Fi module is set to access point mode with an SSID "calypso_<MAC_ADDRESS>". Connect your PC (Laptop/tablet/smartphone) to this access point, displayed on the screen.
 ![Config Mode](images/configMode.jpg)
 
-   - b. On the PC open a browser.
+  b. On the PC open a browser.
               
-   - c. In the browser, navigate to calypso.net/azure.html.                     
+  c. In the browser, navigate to calypso.net/azure.html.                     
 ![Connect to AP](images/connectToAP.png)  
 
-   - d. Click on the "Choose Files" button. This opens the file browser. Browse to the location where the configuration files were generated as described in the previous section. The files are stored under the path "working directory > Azure > <Device ID>". Select all the files in the directory and click on "Upload" button. On success, the message "Success: 204 No content" at the bottom of the page indicates successful configuration of the device.
+  d. Click on the "Choose Files" button. This opens the file browser. Browse to the location where the configuration files were generated as described in the previous section. The files are stored under the path "working directory > Azure > <Device ID>". Select all the files in the directory and click on "Upload" button. On success, the message "Success: 204 No content" at the bottom of the page indicates successful configuration of the device.
  ![Upload](images/upload.png)             
 ![Select All Files](images/selectAllFiles.png)
  
-   - e. Restart the device by clicking the "Reset" button.
+  e. Restart the device by clicking the "Reset" button.
               
 ![Reset](images/reset.jpg)
                   
  - On restarting, the device goes through the following steps automatically,
               
-    - a. Initialize the hardware.
+  a. Initialize the hardware.
               
-    - b. Connect to the configured Wi-Fi network.
+  b. Connect to the configured Wi-Fi network.
               
-    - c. Connect to the Microsoft Azure Device provisioning service (DPS).
+  c. Connect to the Microsoft Azure Device provisioning service (DPS).
+            
+  d. After authentication, the DPS assigns the address of the IoT hub (Device management service of Azure) to connect.
               
-    - d. After authentication, the DPS assigns the address of the IoT hub (Device management service of Azure) to connect.
+  e. This address is saved in the secure storage of the Calypso Wi-Fi module for further use.
               
-    - e. This address is saved in the secure storage of the Calypso Wi-Fi module for further use.
-              
-    - f. Finally, the device connects securely to the IoT central platform and starts exchange of data.
+  f. Finally, the device connects securely to the IoT central platform and starts exchange of data.
               
 At this stage, the device is fully configured, securely connected and ready to use. On subsequent boot-up the device directly connects to the platform using the saved address and starts exchanging data with the platform.
              
 ![Connected](images/connected.jpg)  
 
-### View the device default dashboard
+## **View the device default dashboard**
 
 To access the device on the IoT platform, navigate to "Devices -> All devices -> <Device ID>".
   
@@ -255,7 +234,7 @@ The telemetry data is displayed graphically in the "Overview" tab.
   
 ![Overview](images/overview.png)
  
-### Send commands to device
+## **Send commands to device**
   
 In order to send a command to change the mini neo-pixel LED on the device, click on the command tab on the device page. Enter the RGB values and click on Run. The message is processed by the device and the colour of the LED is changed accordingly.
   
@@ -270,7 +249,7 @@ To update the send frequency, type in ""telemetrySendFrequency": "<Send frequenc
 
 ![Telemetry send frequency](images/devprop1.png)
 
-### Factory resetting the device
+## **Factory resetting the device**
 
 In order to reset the device to factory state, press the "button C" once, then Press and hold "button C" till the following message is displayed on the screen, "Reset device to factory state". 
 This procedure resets the device to default state. Follow the device configuration process defined earlier to reconfigure the device.
