@@ -88,47 +88,24 @@ MrY=\n\
 
 /*Device certificate chain*/
 #define DEVICE_CERT "-----BEGIN CERTIFICATE-----\n\
-MIIBuTCCAWCgAwIBAgIEZC6FgzAKBggqhkjOPQQDAjAfMQswCQYDVQQGEwJERTEQ\n\
-MA4GA1UEAxMHUm9vdCBDQTAeFw0yMzA0MDUwODQwMzRaFw0yMzA1MDYwODQwMzJa\n\
-MBIxEDAOBgNVBAMTB2NoYW5kcmEwWTATBgcqhkjOPQIBBggqhkjOPQMBBwNCAAT3\n\
-cWr0PZa8m1CgF8AMxE4qODBUV8YUkfLR7Im/7dwby+EEShASxhQ7QmO4n98xAlRU\n\
-XUxt6a9xEM80vpA5Ez3Uo4GWMIGTMAwGA1UdEwEB/wQCMAAwDgYDVR0PAQH/BAQD\n\
-AgWgMB8GA1UdIwQYMBaAFCwiA1Rs2xAlGt1LOEYhI6QiLwLBMBQGA1UdEQQNMAuC\n\
-CWxvY2FsaG9zdDAdBgNVHSUEFjAUBggrBgEFBQcDAgYIKwYBBQUHAwEwHQYDVR0O\n\
-BBYEFCGHbjUTy3kRlglCPjncMlm0UOMWMAoGCCqGSM49BAMCA0cAMEQCIAmcXc5B\n\
-wA/zHaHyvXgaVyZE5n0nu84O/ZUTF3CM2MBvAiB2qE+XT5MgW3V6wKGmxSEhZGo/\n\
-hdm17fFD2oazm67xwg==\n\
 -----END CERTIFICATE-----\n\
 -----BEGIN CERTIFICATE-----\n\
-MIIBrzCCAVSgAwIBAgIIBJzCNeo8bZEwCgYIKoZIzj0EAwIwHzELMAkGA1UEBhMC\n\
-REUxEDAOBgNVBAMTB1Jvb3QgQ0EwHhcNMjMwNDA1MDg0MDMyWhcNMjMwNTA2MDg0\n\
-MDMyWjAfMQswCQYDVQQGEwJERTEQMA4GA1UEAxMHUm9vdCBDQTBZMBMGByqGSM49\n\
-AgEGCCqGSM49AwEHA0IABDjFCVc50YTE+JdrHAEkoALy5GhYh1K0ImWfy54VvCjI\n\
-X/0joCYqMQnO7oTdIEUnJL78b5OYCrhH00aKSCUxO7WjejB4MBIGA1UdEwEB/wQI\n\
-MAYBAf8CAQMwDgYDVR0PAQH/BAQDAgIEMBQGA1UdEQQNMAuCCWxvY2FsaG9zdDAd\n\
-BgNVHSUEFjAUBggrBgEFBQcDAgYIKwYBBQUHAwEwHQYDVR0OBBYEFCwiA1Rs2xAl\n\
-Gt1LOEYhI6QiLwLBMAoGCCqGSM49BAMCA0kAMEYCIQDjp4QerlmH/lCoz9WKwtB4\n\
-KWgYv2G9qPmvbd+Kz2G8AwIhAOt4YxzO+osJtf51Xz9RwfAa8senbrEWeXsg4jqO\n\
-2s6D\n\
 -----END CERTIFICATE-----"
 
 /*Device key*/
 #define DEVICE_KEY "-----BEGIN EC PRIVATE KEY-----\n\
-MHcCAQEEIOisCevk4n3FSXvBaAWD+Pajg99dA61lPPaRCB1gIz4aoAoGCCqGSM49AwEHoUQDQgAE\n\
-93Fq9D2WvJtQoBfADMROKjgwVFfGFJHy0eyJv+3cG8vhBEoQEsYUO0JjuJ/fMQJUVF1MbemvcRDP\n\
-NL6QORM91A==\n\
 -----END EC PRIVATE KEY-----"
 
 #define CONFIGURATION_DATA "{\n\
   \"version\": 1,\n\
-	\"deviceId\": \"chandra\",\n\
-	\"scopeId\": \"0ne000FFA42\",\n\
+	\"deviceId\": \"Calypso-129001293\",\n\
+	\"scopeId\": \"0ne006E0511\",\n\
 	\"DPSServer\": \"global.azure-devices-provisioning.net\",\n\
-	\"modelId\": \"dtmi:wurthelektronik:designkit:calypsoiotkit;1\",\n\
+	\"modelId\": \"dtmi:wuerthelektronik:designkit:calypsoiotkit;1\",\n\
 	\"SNTPServer\": \"0.de.pool.ntp.org\",\n\
 	\"timezone\": \"60\",\n\
-  \"WiFiSSID\": \"WE_backup\",\n\
-  \"WiFiPassword\": \"079429455001\",\n\
+  \"WiFiSSID\": \"SSID\",\n\
+  \"WiFiPassword\": \"password\",\n\
   \"WiFiSecurity\":3\n\
 }"
 

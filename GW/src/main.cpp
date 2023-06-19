@@ -73,7 +73,7 @@ void OnBtnPress()
 
 void setup()
 {
-    delay(1000);
+    delay(7000);
 
     /*Initialize the OLED display*/
     SH1107_Init();

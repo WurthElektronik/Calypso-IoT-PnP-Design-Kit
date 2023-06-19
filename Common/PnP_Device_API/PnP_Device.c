@@ -135,15 +135,11 @@ TypeSerial *Device_init(void *Debug, void *CalypsoSerial)
     if (!Calypso_simpleInit(calypso))
     {
         SSerial_printf(SerialDebug, "Calypso init failed \r\n");
-        sprintf(displayText, "Calypso Init Failed...");
-        SH1107_Display(1, 0, 24, displayText);
     }
 
     if (!PADS_simpleInit(sensorPADS))
     {
         SSerial_printf(SerialDebug, "PADS init failed \r\n");
-        sprintf(displayText, "PADS Init Failed...");
-        SH1107_Display(1, 0, 24, displayText);
     }
     else
     {
@@ -153,8 +149,6 @@ TypeSerial *Device_init(void *Debug, void *CalypsoSerial)
     if (!ITDS_simpleInit(sensorITDS))
     {
         SSerial_printf(SerialDebug, "ITDS init failed \r\n");
-        sprintf(displayText, "ITDS Init Failed...");
-        SH1107_Display(1, 0, 24, displayText);
     }
     else
     {
@@ -164,8 +158,6 @@ TypeSerial *Device_init(void *Debug, void *CalypsoSerial)
     if (!TIDS_simpleInit(sensorTIDS))
     {
         SSerial_printf(SerialDebug, "TIDS init failed \r\n");
-        sprintf(displayText, "TIDS Init Failed...");
-        SH1107_Display(1, 0, 24, displayText);
     }
     else
     {
@@ -175,8 +167,6 @@ TypeSerial *Device_init(void *Debug, void *CalypsoSerial)
     if (!HIDS_simpleInit(sensorHIDS))
     {
         SSerial_printf(SerialDebug, "HIDS init failed \r\n");
-        sprintf(displayText, "HIDS Init Failed...");
-        SH1107_Display(1, 0, 24, displayText);
     }
     else
     {
@@ -185,6 +175,7 @@ TypeSerial *Device_init(void *Debug, void *CalypsoSerial)
     messageID = 0;
     packetLost = 0;
 
+    // Device_reset();
     // Device_writeConfigFiles();
     sprintf(displayText, "Loading configuration...");
     SH1107_Display(1, 0, 24, displayText);
@@ -758,7 +749,7 @@ static json_value *Device_GetCloudResponse()
     }
     else
     {
-        // SSerial_printf(SerialDebug, "No message\r\n");
+        SSerial_printf(SerialDebug, "No message\r\n");
     }
     return response;
 }
