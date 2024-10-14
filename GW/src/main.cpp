@@ -24,7 +24,7 @@
  * IN THE ROOT DIRECTORY OF THIS PACKAGE
  */
 
-#include "PnP_Device.h"
+#include "PnP_Common_Device.h"
 
 // Serial Ports
 //------User Debug Interface
@@ -35,7 +35,6 @@ enum
     invalidFirmwareVersion,
     waitingForConfig,
     configuringDevice,
-    provisioning,
     connectingToCloud,
     idle,
     sendSensorData,
@@ -49,16 +48,63 @@ unsigned long startTime = 0;
 unsigned long interval = 0;
 volatile uint8_t buttonPressCount = 0;
 
-char displayText[100];
+char displayText[150];
+char displayEventText[120];
+
+extern IoT_platforms_t platform;
+
+bool previousConfigDeleted = false;
 
 // Long press callback
-void OnBtnLongPress()
+void OnBtnLongPress_A()
+{
+}
+
+void OnBtnLongPress_B()
+{
+    // switch to another platform
+    if ((platform == AZURE) && Device_writeConfigFile(PLATFORM_CONFIG_FILE_PATH, "{\"platform\":\"KAAIOT\"}"))
+    {
+        SSerial_printf(Debug, "Platform config switched to KAAIOT. Reboot device to apply changes\r\n");
+        sprintf(displayEventText, "Platform config\r\n\r\nswitched to KAAIOT.\r\n\r\nReboot device\r\n\r\nto apply changes");
+        Device_displayMessageWithDelay(displayEventText);
+        if (statusFlag == waitingForConfig)
+        {
+            SH1107_Display(1, 0, 0, displayText);
+        }
+    }
+    else if ((platform == KAAIOT) && Device_writeConfigFile(PLATFORM_CONFIG_FILE_PATH, "{\"platform\":\"AZURE\"}"))
+    {
+        SSerial_printf(Debug, "Platform config switched to AZURE. Reboot device to apply changes\r\n");
+        sprintf(displayEventText, "Platform config\r\n\r\nswitched to AZURE.\r\n\r\nReboot device\r\n\r\nto apply changes");
+        Device_displayMessageWithDelay(displayEventText);
+        if (statusFlag == waitingForConfig)
+        {
+            SH1107_Display(1, 0, 0, displayText);
+        }
+    }
+    else
+    {
+        SSerial_printf(Debug, "Unknown platform selected\r\n");
+        return;
+    }
+}
+
+void OnBtnLongPress_C()
 {
     statusFlag = factoryReset;
 }
 
+void OnBtnPress_A()
+{
+}
+
+void OnBtnPress_B()
+{
+}
+
 // Switch the device to configuration mode
-void OnBtnPress()
+void OnBtnPress_C()
 {
     buttonPressCount++;
     if (buttonPressCount >= 1)
@@ -66,6 +112,7 @@ void OnBtnPress()
         if (statusFlag == waitingForConfig)
         {
             statusFlag = configuringDevice;
+            previousConfigDeleted = true;
         }
         buttonPressCount = 0;
     }
@@ -73,54 +120,65 @@ void OnBtnPress()
 
 void setup()
 {
-    delay(1000);
+    delay(5000);
+
+    pinMode(BUTTON_A, INPUT_PULLUP);
+    pinMode(BUTTON_B, INPUT_PULLUP);
 
     /*Initialize the OLED display*/
     SH1107_Init();
 
-    sprintf(displayText, "Intializing device...");
+    sprintf(displayText, "Initializing device\r\n...");
     SH1107_Display(1, 0, 24, displayText);
 
     // Initialize the Calypso Wi-Fi module, sensors and the serial port for debug
     Debug = Device_init(&Serial, &Serial1);
 
     // Initialize the button S2
-    buttonInit(BUTTON_C, OnBtnPress, OnBtnLongPress);
+    buttonInit(BUTTON_A_ID, BUTTON_A, OnBtnPress_A, OnBtnLongPress_A);
+    buttonInit(BUTTON_B_ID, BUTTON_B, OnBtnPress_B, OnBtnLongPress_B);
+    buttonInit(BUTTON_C_ID, BUTTON_C, OnBtnPress_C, OnBtnLongPress_C);
 
     /*Initialize the Neo-pixel LED*/
     neopixelInit();
     neopixelSet(NEO_PIXEL_RED);
+
+    if (!Device_isIotPlatformConfigured())
+    {
+        SSerial_printf(Debug, "Device IoT platform not configured. Use web menu to configure.\r\n");
+        sprintf(displayText, "Error! IoT platform\r\n\r\nnot configured\r\n\r\nUse following info\r\n\r\nto configure.");
+        neopixelSet(NEO_PIXEL_RED);
+        Device_displayMessageWithDelay(displayText);
+    }
+
     if (Device_isUpToDate())
     {
-
-        /*Check if the device is connected to Wi-Fi and has the config file*/
-        if ((!Device_isConnectedToWiFi()) || (!Device_isConfigured()))
+        if (!Device_isConfigured()) /*Check if the device has the config file*/
         {
             statusFlag = waitingForConfig;
             SSerial_printf(Debug, "Waiting for a device configuration...\r\n");
             SSerial_printf(Debug, "Push the button C twice to enter configuration mode\r\n");
-            sprintf(displayText, "Device not configured\r\n\r\nTo configure\r\n\r\ndouble press\r\n\r\n<- button C");
+            sprintf(displayText, "Device not configured\r\n\r\n\r\nTo switch platform:\r\n<- btn B long press\r\n\r\nTo configure:\r\n<- btn C double click");
+            SH1107_Display(1, 0, 0, displayText);
+            neopixelSet(NEO_PIXEL_RED);
+        }
+        else if (!Device_isConnectedToWiFi())
+        {
+            statusFlag = waitingForConfig;
+            SSerial_printf(Debug, "Device was not connected to WiFi. Maybe WiFi configuration is wrong. Check device configuration\r\n");
+            SSerial_printf(Debug, "Push the button C twice to enter configuration mode\r\n");
+            sprintf(displayText, "WiFi not connected\r\nCheck configuration!\r\n\r\nTo switch platform:\r\n<- btn B long press\r\n\r\nTo configure:\r\n<- btn C double click");
             SH1107_Display(1, 0, 0, displayText);
             neopixelSet(NEO_PIXEL_RED);
         }
         else
         {
-            /*Check if the device is provisioned in the cloud*/
-            if (Device_isProvisioned() == true)
-            {
-                /*Connect to IoT hub directly*/
-                SSerial_printf(Debug, "Device is provisioned\r\n");
-                sprintf(displayText, "Device is provisioned");
-                SH1107_Display(1, 0, 24, displayText);
-                statusFlag = connectingToCloud;
-            }
-            else
-            {
-                /*Start provisioning*/
-                sprintf(displayText, "Provisioning in Progress...");
-                SH1107_Display(1, 0, 24, displayText);
-                statusFlag = provisioning;
-            }
+            /*Connect to Platform*/
+            SSerial_printf(Debug, "Device is configured\r\n");
+            sprintf(displayText, "Device is configured");
+            SH1107_Display(1, 0, 24, displayText);
+            LED_INDICATION_SHORT_DELAY;
+            statusFlag = connectingToCloud;
         }
     }
     else
@@ -140,7 +198,7 @@ void loop()
         SSerial_printf(Debug, "Older firmware detected\r\n");
         sprintf(displayText, "Calypso Firmware old \r\n\r\nUpdate Calypso");
         SH1107_Display(1, 0, 16, displayText);
-        delay(5000);
+        LED_INDICATION_LONG_DELAY;
         break;
     }
     break;
@@ -149,6 +207,11 @@ void loop()
         break;
     case configuringDevice:
     {
+        if (!previousConfigDeleted)
+        {
+            Device_deletePreviousConfigIfExist();
+            previousConfigDeleted = true;
+        }
         Device_WiFi_provisioning();
         Device_configurationInProgress();
         neopixelSet(NEO_PIXEL_RED);
@@ -157,36 +220,25 @@ void loop()
         delay(3500);
     }
     break;
-    case provisioning:
-    {
-        neopixelSet(NEO_PIXEL_ORANGE);
-        if (Device_provision())
-        {
-            statusFlag = connectingToCloud;
-        }
-        else
-        {
-            sprintf(displayText, "Error:Provisioning failed");
-            SH1107_Display(1, 0, 24, displayText);
-            statusFlag = errorState;
-        }
-    }
-    break;
     case connectingToCloud:
     {
         neopixelSet(NEO_PIXEL_ORANGE);
-        sprintf(displayText, "Connecting to \r\nIoT central...");
-        SH1107_Display(1, 0, 24, displayText);
-        /*Get the access token*/
-        if (Device_isProvisioned() == true)
+        if (platform == KAAIOT)
         {
-            /*Connect to the cloud*/
-            Device_MQTTConnect();
-            Device_SubscribeToTopics();
-            Device_PublishProperties();
-            neopixelSet(NEO_PIXEL_GREEN);
-            statusFlag = idle;
+            sprintf(displayText, "Connecting to \r\n\r\nKaaIoT...");
         }
+        else if (platform == AZURE)
+        {
+            sprintf(displayText, "Connecting to \r\n\r\nAzure...");
+        }
+        SH1107_Display(1, 0, 16, displayText);
+
+        /*Connect to the cloud*/
+        Device_MQTTConnect();
+        Device_SubscribeToTopics();
+        neopixelSet(NEO_PIXEL_GREEN);
+        statusFlag = idle;
+
         break;
     }
     case idle:
@@ -196,10 +248,10 @@ void loop()
             Device_restart();
         }
         Device_processCloudMessage();
-        if (sensorsPresent == true)
+        if (Device_isSensorsPresent() == true)
         {
             interval = micros() - startTime;
-            if (interval >= (telemetrySendInterval * 1000))
+            if (interval >= (Device_getTelemetrySendInterval() * 1000))
             {
                 /*Time to send sensor data*/
                 statusFlag = sendSensorData;
@@ -224,13 +276,14 @@ void loop()
         SSerial_printf(Debug, "Error, unknown state...\r\n");
         sprintf(displayText, "Error state: \r\nReset/reconfigure device");
         SH1107_Display(1, 0, 24, displayText);
-        delay(1000);
+        LED_INDICATION_SHORT_DELAY;
         break;
     }
     case factoryReset:
     {
-        sprintf(displayText, "Reset device to \r\nFactory state");
-        SH1107_Display(1, 0, 24, displayText);
+        sprintf(displayText, "Reset device to \r\n\r\nFactory state");
+        SH1107_Display(1, 0, 16, displayText);
+        LED_INDICATION_SHORT_DELAY;
         neopixelSet(NEO_PIXEL_RED);
         Device_reset();
     }

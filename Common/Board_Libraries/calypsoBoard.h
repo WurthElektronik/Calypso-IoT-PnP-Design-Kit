@@ -137,12 +137,14 @@ extern "C"
     bool Calypso_fileExists(CALYPSO *self, const char *fileName);
     bool Calypso_writeFile(CALYPSO *self, const char *path, const char *data,
                            uint16_t dataLength);
+    bool Calypso_writeBigFile(CALYPSO *self, const char *path, const char *data, uint16_t dataLength);
     bool Calypso_readFile(CALYPSO *self, const char *path, char *data,
                           uint16_t dataLength, uint16_t *outputLength);
     bool Calypso_deleteFile(CALYPSO *self, const char *fileName);
     bool Calypso_waitForResponse(CALYPSO *self);
     bool Calypso_isIPConnected(CALYPSO *self);
     bool Calypso_ProvisioningDone(CALYPSO *self);
+    bool Calypso_getTime(CALYPSO *self);
     bool Calypso_getUDID(CALYPSO *self);
 
 #ifdef __cplusplus

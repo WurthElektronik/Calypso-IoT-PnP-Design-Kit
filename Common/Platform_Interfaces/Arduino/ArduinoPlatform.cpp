@@ -576,34 +576,48 @@ void neopixelSet(uint32_t color)
   pixels.show();
 }
 
-EasyButton *button;
+EasyButton *buttons[BUTTONS];
 
 /**
  * @brief  ISR for button
  * @param  None
  * @retval None
  */
-void buttonISR() { button->read(); }
+void buttonISR_A() { buttons[BUTTON_A_ID]->read(); }
+void buttonISR_B() { buttons[BUTTON_B_ID]->read(); }
+void buttonISR_C() { buttons[BUTTON_C_ID]->read(); }
 
 /**
  * @brief  Initialise button
+ * @param  buttonId button ID
  * @param  Pin number
  * @param  OnBtnPress callback on button press
  * @param  OnBtnLongPress callback on button long press
  * @retval None
  */
 
-void buttonInit(uint8_t pin, void (*OnBtnPress)(), void (*OnBtnLongPress)())
+void buttonInit(uint8_t buttonId, uint8_t pin, void (*OnBtnPress)(), void (*OnBtnLongPress)())
 {
-
-  button = new EasyButton(pin);
+  EasyButton *button = new EasyButton(pin);
+  buttons[buttonId] = button;
 
   button->begin();
   button->onPressedFor(BTN_LONG_PRESS_DURATION_MS, OnBtnLongPress);
   button->onPressed(OnBtnPress);
   if (button->supportsInterrupt())
   {
-    button->enableInterrupt(buttonISR);
+    if (buttonId == BUTTON_A_ID)
+    {
+      button->enableInterrupt(buttonISR_A);
+    }
+    else if (buttonId == BUTTON_B_ID)
+    {
+      button->enableInterrupt(buttonISR_B);
+    }
+    else if (buttonId == BUTTON_C_ID)
+    {
+      button->enableInterrupt(buttonISR_C);
+    }
   }
 }
 
@@ -613,7 +627,10 @@ void buttonInit(uint8_t pin, void (*OnBtnPress)(), void (*OnBtnLongPress)())
  */
 void buttonUpdate()
 {
-  button->update();
+  for (uint8_t i = 0; i < BUTTONS; i++)
+  {
+    buttons[i]->update();
+  }
 }
 
 /**

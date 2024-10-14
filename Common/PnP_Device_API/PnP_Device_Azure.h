@@ -123,9 +123,6 @@ MrY=\n\
 #define DEVICE_IOT_HUB_ADDRESS "user/iotHubAddr"
 #define CONFIG_FILE_PATH "user/azdevconf"
 
-// Button labelled C on the OLED display
-#define BUTTON_C (byte)5
-
 /*Wi-Fi settings*/
 #define WI_FI_CONNECT_DELAY 5000UL
 
@@ -135,7 +132,6 @@ MrY=\n\
 #define MQTT_TLS_VERSION "TLSV1_2"
 #define MQTT_CIPHER "TLS_RSA_WITH_AES_256_CBC_SHA256"
 
-#define DEVICE_CREDENTIALS_MAX_LEN 64
 #define MAX_URL_LEN 128
 #define DEVICE_CLAIM_DURATION 180000
 
@@ -170,29 +166,30 @@ MrY=\n\
 
   extern bool sensorsPresent;
   extern volatile unsigned long telemetrySendInterval;
-  TypeSerial *Device_init(void *Debug, void *CalypsoSerial);
-  void Device_writeConfigFiles();
-  bool Device_isConfigured();
-  bool Device_isConnectedToWiFi();
-  bool Device_isProvisioned();
-  void Device_MQTTConnect();
-  void Device_readSensors();
-  void Device_PublishSensorData();
-  void Device_PublishProperties();
-  void Device_listOfFiles();
-  void Device_connect_WiFi();
-  void Device_disconnect_WiFi();
-  void Device_WiFi_provisioning();
-  bool Device_provision();
-  void Device_configurationInProgress();
-  bool Device_SubscribeToTopics();
-  void Device_reset();
-  void Device_restart();
-  bool Device_isStatusOK();
-  void Device_processCloudMessage();
-  bool Device_ConfigurationComplete();
-  void Device_displaySensorData();
-  bool Device_isUpToDate();
+  TypeSerial *Azure_Device_init(void *Debug, void *CalypsoSerial);
+  void Azure_Device_writeConfigFiles();
+  bool Azure_Device_isConfigured();
+  bool Azure_Device_isConnectedToWiFi();
+  bool Azure_Device_isProvisioned();
+  void Azure_Device_MQTTConnect();
+  void Azure_Device_readSensors();
+  void Azure_Device_PublishSensorData();
+  void Azure_Device_PublishProperties();
+  void Azure_Device_connect_WiFi();
+  void Azure_Device_disconnect_WiFi();
+  void Azure_Device_WiFi_provisioning();
+  bool Azure_Device_provision();
+  void Azure_Device_configurationInProgress();
+  bool Azure_Device_SubscribeToTopics();
+  void Azure_Device_reset();
+  void Azure_Device_restart();
+  bool Azure_Device_isStatusOK();
+  void Azure_Device_processCloudMessage();
+  bool Azure_Device_ConfigurationComplete();
+  void Azure_Device_displaySensorData();
+  bool Azure_Device_isUpToDate();
+  unsigned long Azure_Device_getTelemetrySendInterval();
+  bool Azure_Device_isSensorsPresent();
 #ifdef __cplusplus
 }
 #endif

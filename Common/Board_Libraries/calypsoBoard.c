@@ -153,6 +153,27 @@ bool Calypso_reboot(CALYPSO *self)
     return false;
 }
 
+bool Calypso_getTime(CALYPSO *self)
+{
+    /* Get IP address */
+    if (Calypso_SendRequest(self, "AT+get=general,time\r\n"))
+    {
+        char dateTime[30];
+        /* Parse response */
+        if (0 < self->bufferCalypso.length)
+        {
+            if (0 == strncmp(self->bufferCalypso.data, "+get:", 4))
+            {
+                char *parameters = &(self->bufferCalypso.data[0]);
+                Calypso_getNextArgumentString(&parameters, dateTime, CONFIRM_DELIM);
+                SSerial_printf(self->serialDebug, "Date-time: %s\r\n", dateTime);
+                return true;
+            }
+        }
+    }
+    return false;
+}
+
 bool Calypso_getUDID(CALYPSO *self)
 {
     /* Get IP address */
@@ -365,7 +386,7 @@ bool Calypso_setUpSNTP(CALYPSO *self)
     if (!Calypso_SendRequest(self, pRequestCommand))
     {
 #if SERIAL_DEBUG
-        SSerial_printf(self->serialDebug, "SNTP time_zone set faile\r\n");
+        SSerial_printf(self->serialDebug, "SNTP time_zone set fail\r\n");
 #endif
         return false;
     }
@@ -602,6 +623,10 @@ bool Calypso_MQTTSet(CALYPSO *self)
 {
     bool ret = false;
     int index = MQTT_SOCKET_INDEX;
+    if (strlen(self->settings.mqttSettings.userOptions.userName) == 0)
+    {
+        return true;
+    }
     pRequestCommand = &requestBuffer[0];
     memset(pRequestCommand, 0, CALYPSO_LINE_MAX_SIZE);
     strcpy(pRequestCommand, "AT+mqttSet=");
@@ -780,6 +805,7 @@ bool Calypso_readFile(CALYPSO *self, const char *path, char *data,
     }
     return ret;
 }
+
 /**
  * @brief Create/open and write data to a file
  * @param  self Pointer to the calypso object.
@@ -836,6 +862,80 @@ bool Calypso_writeFile(CALYPSO *self, const char *path, const char *data,
         return false;
     }
 }
+
+/**
+ * @brief Write big buffer to a file
+ * @param  self Pointer to the calypso object.
+ * @param  path Pointer to the file path including the filename
+ * @param  data Pointer to data to be written
+ * @param  dataLength Length of data to write
+ * @retval true if successful false in case of failure
+ */
+bool Calypso_writeBigFile(CALYPSO *self, const char *path, const char *data, uint16_t dataLength)
+{
+    bool ret = false;
+    uint32_t fileID;
+    uint32_t sToken;
+    uint16_t srcOffset = 0;
+    uint16_t dstOffset = 0;
+    uint16_t bytesRemaining = dataLength;
+    uint16_t chunkSize = 0;
+    char dataToWrite[CALYPSO_FILE_WRITE_SIZE_MAX] = {0};
+
+    SSerial_printf(self->serialDebug, "Create file %s | %i\r\n", path, dataLength);
+
+    if (Calypso_fileExists(self, path))
+    {
+        SSerial_printf(self->serialDebug, "Error. File already exist: %s\r\n", path);
+        return false;
+    }
+
+    ret = ATFile_open(self, path, ATFILE_OPEN_CREATE | ATFILE_OPEN_OVERWRITE, dataLength, &fileID, &sToken);
+    if (ret)
+    {
+        while (bytesRemaining > 0)
+        {
+            // Calculate how many bytes to copy in this iteration (CALYPSO_FILE_WRITE_SIZE_MAX or fewer for the last chunk)
+            chunkSize = (bytesRemaining >= CALYPSO_FILE_WRITE_SIZE_MAX) ? CALYPSO_FILE_WRITE_SIZE_MAX : bytesRemaining;
+
+            memcpy(dataToWrite, data + srcOffset, chunkSize);
+
+            SSerial_printf(self->serialDebug, "Write %i bytes, %i offset to file %s. Remaining: %i\r\n", chunkSize, srcOffset, path, bytesRemaining);
+            ret = ATFile_write(self, fileID, srcOffset, Calypso_DataFormat_Base64, true, chunkSize, dataToWrite, &dstOffset);
+            if (!ret)
+            {
+                SSerial_printf(self->serialDebug, "Error during writing to file: %s\r\n", path);
+                break;
+            }
+
+            srcOffset += chunkSize;
+            if (bytesRemaining > chunkSize)
+            {
+                bytesRemaining -= chunkSize;
+            }
+            else
+            {
+                bytesRemaining = 0;
+            }
+        }
+    }
+    else
+    {
+        SSerial_printf(self->serialDebug, "Can't create file %s\r\n", path);
+    }
+
+    SSerial_printf(self->serialDebug, "Close the file: %s\r\n", path);
+    if (!ATFile_close(self, fileID, NULL, NULL))
+    {
+        SSerial_printf(self->serialDebug, "Can't close file %s\r\n", path);
+        ret = false;
+    }
+
+    Calypso_fileExists(self, path);
+
+    return ret;
+}
+
 /**
  * @brief  Open a file
  * @param  self Pointer to the calypso object
@@ -852,7 +952,7 @@ bool ATFile_open(CALYPSO *self, const char *fileName, uint32_t options,
     bool ret = false;
     pRequestCommand = &requestBuffer[0];
     memset(pRequestCommand, 0, CALYPSO_LINE_MAX_SIZE);
-    strcpy(pRequestCommand, "AT+fileOpen=");
+    strcpy(pRequestCommand, "AT+FileOpen=");
     if (fileSize < FILE_MIN_SIZE)
     {
         fileSize = FILE_MIN_SIZE;
@@ -992,7 +1092,7 @@ bool ATFile_getInfo(CALYPSO *self, const char *fileName, uint32_t secureToken)
     bool ret = false;
     pRequestCommand = &requestBuffer[0];
     memset(pRequestCommand, 0, CALYPSO_LINE_MAX_SIZE);
-    strcpy(pRequestCommand, "AT+fileGetInfo=");
+    strcpy(pRequestCommand, "AT+FileGetInfo=");
     ret = ATFile_AddArgumentsFileDel(pRequestCommand, fileName, secureToken);
     if (ret)
     {

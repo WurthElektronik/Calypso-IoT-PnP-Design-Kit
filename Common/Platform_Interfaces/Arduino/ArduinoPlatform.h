@@ -48,6 +48,11 @@
 
 #define BTN_LONG_PRESS_DURATION_MS 2000
 
+#define BUTTONS 3
+#define BUTTON_A_ID 0
+#define BUTTON_B_ID 1
+#define BUTTON_C_ID 2
+
 /**         Functions definition         */
 
 #ifdef __cplusplus
@@ -103,7 +108,7 @@ extern "C"
     void neopixelInit();
     void neopixelSet(uint32_t color);
 
-    void buttonInit(uint8_t pin, void (*OnBtnPress)(), void (*OnBtnLongPress)());
+    void buttonInit(uint8_t buttonId, uint8_t pin, void (*OnBtnPress)(), void (*OnBtnLongPress)());
     void buttonUpdate();
     float getBatteryVoltage();
 

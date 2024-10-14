@@ -25,53 +25,52 @@
 #include <string.h>
 
 #include "json-builder.h"
-#include "PnP_Device.h"
+#include "PnP_Common_Device.h"
+#include "PnP_Device_Azure.h"
 #include "time.h"
 
 #define MAX_PACKET_LOSS 3
 
 // Serial Ports
 //------Debug
-TypeSerial *SerialDebug;
+extern TypeSerial *SerialDebug;
 //------Calypso
-TypeHardwareSerial *SerialCalypso;
+extern TypeHardwareSerial *SerialCalypso;
 
 // Radio Module
 //------Calpyso
-CALYPSO *calypso;
+extern CALYPSO *calypso;
 
 // Sensors
 //------WSEN_PADS
-PADS *sensorPADS;
+extern PADS *sensorPADS;
 //------WSEN_ITDS
-ITDS *sensorITDS;
+extern ITDS *sensorITDS;
 //------WSEN_TIDS
-TIDS *sensorTIDS;
+extern TIDS *sensorTIDS;
 //------WSEN_HIDS
-HIDS *sensorHIDS;
+extern HIDS *sensorHIDS;
 
-int messageID = 0;
-int sessionID = 0;
-bool sensorsPresent = false;
-bool deviceProvisioned = false;
-bool deviceConfigured = false;
+extern bool sensorsPresent;
+extern bool deviceProvisioned;
+extern bool deviceConfigured;
 
-volatile unsigned long telemetrySendInterval = (unsigned long)(DEFAULT_TELEMETRY_SEND_INTEVAL * 1000);
+extern volatile unsigned long telemetrySendInterval;
 
-uint8_t packetLost = 0;
+extern uint8_t packetLost;
 
-char kitID[DEVICE_CREDENTIALS_MAX_LEN] = {0};
+extern char kitID[DEVICE_CREDENTIALS_MAX_LEN];
 char scopeID[DEVICE_CREDENTIALS_MAX_LEN] = {0};
-char modelID[DEVICE_CREDENTIALS_MAX_LEN] = {0};
+extern char modelID[DEVICE_CREDENTIALS_MAX_LEN];
 char iotHubAddress[MAX_URL_LEN] = {0};
 char dpsServerAddress[MAX_URL_LEN] = {0};
-uint16_t kitIDLength = 0;
+extern uint16_t kitIDLength;
 uint16_t iotHubAddrLen = 0;
-uint8_t reqID = 0;
-float lastBattVolt = 0;
+extern uint8_t reqID;
+extern float lastBattVolt;
 
 static char displayText[128];
-char pubtopic[128];
+extern char pubtopic[128];
 #define MAX_PAYLOAD_LENGTH 1024
 static char sensorPayload[MAX_PAYLOAD_LENGTH];
 
@@ -106,86 +105,9 @@ static void Device_PublishDirectCmdResponse(int status, int requestID);
  * @param  CalypsoSerial Calypso serial port
  * @retval Serial debug port
  */
-TypeSerial *Device_init(void *Debug, void *CalypsoSerial)
+TypeSerial *Azure_Device_init(void *Debug, void *CalypsoSerial)
 {
-
-    CalypsoSettings calypsoParams;
-
-    memset(&calypsoParams.wifiSettings, 0, sizeof(calypsoParams.wifiSettings));
-    memset(&calypsoParams.mqttSettings, 0, sizeof(calypsoParams.mqttSettings));
-    memset(&calypsoParams.sntpSettings, 0, sizeof(calypsoParams.sntpSettings));
-    SerialDebug = SSerial_create(Debug);
-
-    SerialCalypso = HSerial_create(CalypsoSerial);
-
-    SSerial_begin(SerialDebug, 115200);
-
-    HSerial_beginP(SerialCalypso, 921600,
-                   (uint8_t)((0x10ul) | (0x1ul) | (0x400ul)));
-
-    calypso = Calypso_Create(SerialDebug, SerialCalypso, &calypsoParams);
-
-    sensorPADS = PADSCreate(SerialDebug);
-    sensorITDS = ITDSCreate(SerialDebug);
-    sensorTIDS = TIDSCreate(SerialDebug);
-    sensorHIDS = HIDSCreate(SerialDebug);
-
-    SSerial_printf(SerialDebug, "Starting the application...\r\n");
-
-    if (!Calypso_simpleInit(calypso))
-    {
-        SSerial_printf(SerialDebug, "Calypso init failed \r\n");
-        sprintf(displayText, "Calypso Init Failed...");
-        SH1107_Display(1, 0, 24, displayText);
-    }
-
-    if (!PADS_simpleInit(sensorPADS))
-    {
-        SSerial_printf(SerialDebug, "PADS init failed \r\n");
-        sprintf(displayText, "PADS Init Failed...");
-        SH1107_Display(1, 0, 24, displayText);
-    }
-    else
-    {
-        sensorsPresent = true;
-    }
-
-    if (!ITDS_simpleInit(sensorITDS))
-    {
-        SSerial_printf(SerialDebug, "ITDS init failed \r\n");
-        sprintf(displayText, "ITDS Init Failed...");
-        SH1107_Display(1, 0, 24, displayText);
-    }
-    else
-    {
-        sensorsPresent = true;
-    }
-
-    if (!TIDS_simpleInit(sensorTIDS))
-    {
-        SSerial_printf(SerialDebug, "TIDS init failed \r\n");
-        sprintf(displayText, "TIDS Init Failed...");
-        SH1107_Display(1, 0, 24, displayText);
-    }
-    else
-    {
-        sensorsPresent = true;
-    }
-
-    if (!HIDS_simpleInit(sensorHIDS))
-    {
-        SSerial_printf(SerialDebug, "HIDS init failed \r\n");
-        sprintf(displayText, "HIDS Init Failed...");
-        SH1107_Display(1, 0, 24, displayText);
-    }
-    else
-    {
-        sensorsPresent = true;
-    }
-    messageID = 0;
-    packetLost = 0;
-
-    // Device_writeConfigFiles();
+    Azure_Device_writeConfigFiles();
     sprintf(displayText, "Loading configuration...");
     SH1107_Display(1, 0, 24, displayText);
     if (Device_loadConfiguration() == true)
@@ -193,11 +115,11 @@ TypeSerial *Device_init(void *Debug, void *CalypsoSerial)
         deviceConfigured = true;
         sprintf(displayText, "Connecting to Wi-Fi..");
         SH1107_Display(1, 0, 24, displayText);
-        Device_connect_WiFi();
+        Azure_Device_connect_WiFi();
     }
     else
     {
-        SSerial_printf(SerialDebug, "Laoding config file failed\r\n");
+        SSerial_printf(SerialDebug, "Loading config file failed\r\n");
     }
 
     if (Calypso_fileExists(calypso, DEVICE_IOT_HUB_ADDRESS))
@@ -220,7 +142,7 @@ TypeSerial *Device_init(void *Debug, void *CalypsoSerial)
  * @return true
  * @return false
  */
-bool Device_ConfigurationComplete()
+bool Azure_Device_ConfigurationComplete()
 {
     if (!Calypso_simpleInit(calypso))
     {
@@ -230,7 +152,7 @@ bool Device_ConfigurationComplete()
     if (Device_loadConfiguration() == true)
     {
         deviceConfigured = true;
-        Device_connect_WiFi();
+        Azure_Device_connect_WiFi();
     }
     else
     {
@@ -252,7 +174,7 @@ bool Device_ConfigurationComplete()
  * @return true - Config load success
  * @return false - Config load failed
  */
-bool Device_loadConfiguration()
+static bool Device_loadConfiguration()
 {
     char configBuf[512];
     uint16_t len;
@@ -305,9 +227,9 @@ bool Device_loadConfiguration()
  * @brief  Write config files to calypso
  * @retval None
  */
-void Device_writeConfigFiles()
+void Azure_Device_writeConfigFiles()
 {
-    Device_disconnect_WiFi();
+    Azure_Device_disconnect_WiFi();
 
     if (!Calypso_writeFile(calypso, ROOT_CA_PATH, rootCACert, strlen(rootCACert)))
     {
@@ -335,7 +257,7 @@ void Device_writeConfigFiles()
  * @brief  Restart MCU
  * @retval None
  */
-void Device_restart()
+void Azure_Device_restart()
 {
     soft_reset();
 }
@@ -344,7 +266,7 @@ void Device_restart()
  * @brief  Check if the status of the GW is OK
  * @retval true if OK false otherwise
  */
-bool Device_isStatusOK()
+bool Azure_Device_isStatusOK()
 {
     if (calypso->status == calypso_error)
     {
@@ -360,7 +282,7 @@ bool Device_isStatusOK()
  * @brief  Check if the device is connected to the Wi-Fi network
  * @retval True if connected false otherwise
  */
-bool Device_isConnectedToWiFi()
+bool Azure_Device_isConnectedToWiFi()
 {
     if (Calypso_isIPConnected(calypso))
     {
@@ -374,7 +296,7 @@ bool Device_isConnectedToWiFi()
  * @brief  Check if the device is up to date
  * @retval True or false
  */
-bool Device_isUpToDate()
+bool Azure_Device_isUpToDate()
 {
     char versionStr[20];
     const char dot[2] = ".";
@@ -399,7 +321,7 @@ bool Device_isUpToDate()
  * @brief  Check if the device is provisioned
  * @retval True if provisioned false otherwise
  */
-bool Device_isProvisioned()
+bool Azure_Device_isProvisioned()
 {
     return deviceProvisioned;
 }
@@ -410,7 +332,7 @@ bool Device_isProvisioned()
  * @return true Device is configured
  * @return false Device is not configured
  */
-bool Device_isConfigured()
+bool Azure_Device_isConfigured()
 {
     return deviceConfigured;
 }
@@ -418,7 +340,7 @@ bool Device_isConfigured()
  * @brief  Publish provisioning request and get/save access token
  * @retval True if successful false otherwise
  */
-bool Device_provision()
+bool Azure_Device_provision()
 {
     bool ret = false;
     const char equals[2] = "=";
@@ -547,7 +469,7 @@ bool Device_provision()
     return ret;
 }
 
-void Device_configurationInProgress()
+void Azure_Device_configurationInProgress()
 {
     char temp[20];
     static uint8_t state;
@@ -599,7 +521,7 @@ void Device_configurationInProgress()
  * @brief  Collect data from sensors connected to the device
  * @retval None
  */
-void Device_readSensors()
+void Azure_Device_readSensors()
 {
     if (!PADS_readSensorData(sensorPADS))
     {
@@ -626,7 +548,7 @@ void Device_readSensors()
  * @brief  Connect GW to cloud MQTT sever
  * @retval None
  */
-void Device_MQTTConnect()
+void Azure_Device_MQTTConnect()
 {
     strcpy(calypso->settings.mqttSettings.clientID, kitID);
     sprintf(calypso->settings.mqttSettings.userOptions.userName, "%s/%s/?api-version=2021-04-12&model-id=%s", iotHubAddress, kitID, modelID);
@@ -664,7 +586,7 @@ void Device_MQTTConnect()
  * @brief  Subscribe to topics
  * @retval True if successful false otherwise
  */
-bool Device_SubscribeToTopics()
+bool Azure_Device_SubscribeToTopics()
 {
     if (calypso->status == calypso_MQTT_connected)
     {
@@ -767,9 +689,9 @@ static json_value *Device_GetCloudResponse()
  * @brief  Publish the values of sensors connected to the device
  * @retval None
  */
-void Device_PublishSensorData()
+void Azure_Device_PublishSensorData()
 {
-    Device_readSensors();
+    Azure_Device_readSensors();
     char *dataSerialized = Device_SerializeData();
 #if SERIAL_DEBUG
     // SSerial_writeB(SerialDebug, dataSerialized, strlen(dataSerialized));
@@ -792,7 +714,7 @@ void Device_PublishSensorData()
  * @brief  Display sensor data on OLED display
  * @retval None
  */
-void Device_displaySensorData()
+void Azure_Device_displaySensorData()
 {
     sprintf(displayText, "Status: Connected\r\nP:%0.2f kPa\r\nT:%0.2f C\r\nRH:%0.2f %%\r\nAcc: x:%0.2f g\r\n     y:%0.2f g\r\n     z:%0.2f g",
             sensorPADS->data[0],
@@ -925,7 +847,7 @@ static void Device_PublishMACAddress()
  * @brief  Publish the values of sensors connected to the device
  * @retval None
  */
-void Device_PublishProperties()
+void Azure_Device_PublishProperties()
 {
 
     /*Request the desired values for writable properties*/
@@ -939,19 +861,19 @@ void Device_PublishProperties()
     }
 
     /*Process the response*/
-    Device_processCloudMessage();
+    Azure_Device_processCloudMessage();
 
     Device_PublishVoltage();
-    Device_processCloudMessage();
+    Azure_Device_processCloudMessage();
 
     Device_PublishMACAddress();
-    Device_processCloudMessage();
+    Azure_Device_processCloudMessage();
 
     Device_PublishUDID();
-    Device_processCloudMessage();
+    Azure_Device_processCloudMessage();
 
     Device_PublishSWVersion();
-    Device_processCloudMessage();
+    Azure_Device_processCloudMessage();
 }
 
 /**
@@ -988,7 +910,7 @@ static void Device_PublishSendInterval(uint16_t val, uint16_t ac, uint16_t av, c
  * @brief  Process messages from the cloud
  * @retval None
  */
-void Device_processCloudMessage()
+void Azure_Device_processCloudMessage()
 {
     json_value *cloudResponse = NULL;
     const char backsSlash[2] = "/";
@@ -1111,7 +1033,7 @@ void Device_processCloudMessage()
  * @brief  Connect to WiFi
  * @retval None
  */
-void Device_connect_WiFi()
+void Azure_Device_connect_WiFi()
 {
     if (!Calypso_WLANconnect(calypso))
     {
@@ -1136,7 +1058,7 @@ void Device_connect_WiFi()
  * @brief  Disconnect from WiFi
  * @retval None
  */
-void Device_disconnect_WiFi()
+void Azure_Device_disconnect_WiFi()
 {
     if (!Calypso_WLANDisconnect(calypso))
     {
@@ -1148,9 +1070,9 @@ void Device_disconnect_WiFi()
  * @brief  Reset cloud access token and claim status
  * @retval None
  */
-void Device_reset()
+void Azure_Device_reset()
 {
-    Device_disconnect_WiFi();
+    Azure_Device_disconnect_WiFi();
     /*Delete device credentials*/
     if (Calypso_fileExists(calypso, DEVICE_IOT_HUB_ADDRESS))
     {
@@ -1167,7 +1089,7 @@ void Device_reset()
  * @brief  Start calypso provisioning
  * @retval None
  */
-void Device_WiFi_provisioning()
+void Azure_Device_WiFi_provisioning()
 {
     if (calypso->status == calypso_provisioning)
     {
@@ -1316,4 +1238,14 @@ static void removeChar(char *s, char c)
             s[j++] = s[i];
 
     s[j] = '\0';
+}
+
+unsigned long Azure_Device_getTelemetrySendInterval()
+{
+    return telemetrySendInterval;
+}
+
+bool Azure_Device_isSensorsPresent()
+{
+    return sensorsPresent;
 }
