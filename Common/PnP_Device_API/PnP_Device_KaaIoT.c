@@ -158,6 +158,7 @@ static bool Device_loadConfiguration()
         sprintf(displayText, "Error! Config file\r\n\r\nnot found:\r\n\r\n%s", KAAIOT_CONFIG_FILE_PATH);
         SH1107_Display(1, 0, 0, displayText);
         SSerial_printf(SerialDebug, "Configuration file not found\r\n");
+        LED_INDICATION_LONG_DELAY;
         return false;
     }
 
@@ -166,6 +167,7 @@ static bool Device_loadConfiguration()
         sprintf(displayText, "Error! Root CA\r\n\r\nnot found\r\n\r\n%s", KAAIOT_ROOT_CA_PATH);
         SH1107_Display(1, 0, 0, displayText);
         SSerial_printf(SerialDebug, "Root CA not found\r\n");
+        LED_INDICATION_LONG_DELAY;
         return false;
     }
 
