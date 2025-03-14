@@ -1,104 +1,106 @@
 #  How to create an demo IoT application using the Calypso IoT design kit with KaaIoT?
 ## **Prerequisites**
-The IoT design kit comes with the Firmware pre-installed only for the Azure platform. To enable the possiblility to connect to the KaaIoT platform the fiwmware has to be updated to the latest from this repository. The following items are necessary to go through this process and connecting to the KaaIoT platform.
+The IoT design kit comes with the Firmware pre-installed only for the Azure platform. You need to update the firmware to the latest version from [this repository](https://github.com/PavelAnikeichyk/Calypso-IoT-PnP-Design-Kit/tree/kaaiot) to enable connection to the Kaa IoT platform.
 
-![power-up](images/power-up.jpg)
+The following items are necessary to go through this process and connect to Kaa.
 
-- The design kit with M0 Feather stacked with Calypso Wi-Fi FeatherWing, the Sensor FeatherWing and the OLED FeatherWing.
+- Design kit with M0 Feather stacked with Calypso Wi-Fi FeatherWing, the FeatherWing sensor, and the OLED FeatherWing.
 
-- A Micro-USB cable to power up the design kit stack.
+- Micro-USB cable to power up the design kit stack.
 
 - A Wi-Fi access point (IEEE 802.11 b/g/n compatible) with internet access.
 
-- A Wi-Fi enabled computer with a browser (Chrome or edge recommended).
+- Wi-Fi-enabled computer with a browser (Chrome or Edge browsers are recommended).
 
-- A KaaIoT account. This can be created under the following link:
-https://www.kaaiot.com/free-trial
+- Kaa account. You can get a [free trial](https://www.kaaiot.com/free-trial).
 
-:warning: The design kit will always be delivered with the latest Firmware version (> v2.2.0). 
-In case you use a Calypso FeatherWing which you received separately, make sure that the Calypso FeatherWing has a Firmware version > v2.2.0 [(More Info).](https://www.we-online.com/components/products/manual/2610011025000_Calypso%20261001102500x%20Manual_rev2.0.pdf#page128) 
+![power-up](images/power-up.jpg)
+
+:warning:  The design kit will always be delivered with the latest firmware version (> v2.2.0). If you use a Calypso FeatherWing that you received separately, make sure that the Calypso FeatherWing has a firmware version > v2.2.0 [(Get more info).](https://www.we-online.com/components/products/manual/2610011025000_Calypso%20261001102500x%20Manual_rev2.0.pdf#page128) 
 
 ## **Quick start guide**
-This section will guide you through the process of creating an end-to-end IoT solution. This process involves the following 5 steps at the end of which you should be able to see the telemetry data from the device on the cloud platform.
+This section will guide you through the process of creating an end-to-end IoT solution. This process involves the following 4 steps, at the end of which you should be able to see the telemetry data from the device on the cloud platform.
 
- Each of these steps are described in detail in the subsequent sections.
+Let’s describe each of these steps in detail.
 
-[**1. Create a KaaIoT Application and Endpoint:**](#creating-an-kaaiot-application) In this step, we create an KaaIoT Application and Endpoint.
+[**1. Create a Kaa application and endpoint:**](#creating-an-kaaiot-application) In this step, we create an application and endpoint on the [Kaa Cloud](https://www.kaaiot.com/products/kaa-iot-cloud).
 
-[**2.	Get TLS certificates and private key:**](#download-certificates-from-kaaiot) In this step, the root certificate.
+[**2.	Get TLS certificates and private key:**](#download-certificates-from-kaaiot) This step involves obtaining the root certificate.
 
-[**3.	Configure the device:**](#configure-the-device) This step fully configures the device to connect to cloud.
+[**3.	Configure the device:**](#configure-the-device) This step fully configures the device to connect to the cloud.
 
-[**4. View and interact with device on the KaaIoT platform:**](#view-the-device-telemetry) View device information, telemetry and [interact](#send-commands-to-device) with the device from the cloud platform.
+[**4. View and interact with device on the Kaa IoT platform:**](#view-the-device-telemetry) View device information and telemetry and [interact](#send-commands-to-device) with the device from the cloud platform.
 
-## **Creating a KaaIoT application and endpoint**
+## **Creating a Kaa application and endpoint**
 
- a.	Sign in to the [KaaIoT](https://cloud.kaaiot.com/).
- If a subscription does not exit, please create an account by the [link](https://www.kaaiot.com/free-trial).
+a.	Sign in to the [Kaa](https://cloud.kaaiot.com/).
+ If you don’t have a subscription, please create an account by clicking the [link](https://www.kaaiot.com/free-trial).
 
- b. From the [Device management](https://cloud.kaaiot.com/devices/device-management) page, select the "Applications" and press "Add application" (name it "Wurth application"). 
+ b. From the [Device management](https://cloud.kaaiot.com/devices/device-management) page, select "Applications" and press "Add application" (name it "Wurth application"). 
+
  ![KaaIoT Wurth application](images/kaaiot-wurth-application.png)
 
-:information_source: On the next step the Endpoint will be created. But on that step we will need the token for the Endpoint creation. As usual something unique like device serial number, imei is used as a token. For the simplicity the "calypso-token" will be used as a token.
+:information_source: The next step will involve creating the endpoint. In order to create the endpoint, we will require a token. As usual, we use a unique token, such as a device serial number or IMEI. For simplicity, we will use "calypso-token" as a token.
 
- c.	From the [Device management](https://cloud.kaaiot.com/devices/device-management) page, select the "Devices", select our new application and press "Add device". 
+ c.	From the [Device management](https://cloud.kaaiot.com/devices/device-management) page, select "Devices", then choose your new application, and press "Add device".
+
  ![KaaIoT create endpoint](images/kaaiot-create-endpoint.png)
 
 ## **Get TLS certificates and private key**
 
-In order to securely connect the device to IoT central application, the device needs Root CA certificate, device private key and device certificate. Device private key and device certificate are optional. To get the certificates and private key go to the [Credentials](https://cloud.kaaiot.com/devices/credentials/certificates) page. 
+In order to securely connect the device to the IoT central application, the device needs a Root CA certificate, a device private key, and a device certificate. The device's private key and certificate are optional. To get the certificates and private key, go to the [Credentials](https://cloud.kaaiot.com/devices/credentials/certificates) page. 
 
-"Get root certificate" button allows to see the Root CA. Save this certificate to file with name "kaarootca". 
+"Get root certificate" button allows you to see the Root CA. Save this certificate to file with the name "kaarootca". 
 
-"Add TLS client certificate" button allows to create the device private key (save to file with name "kaadevkey") and certificate (save to file with name "kaadevcert"). For the simplicity we will connect with only Root CA file.
+:warning:  Please pay attention that files should have Unix-based newline characters.
+
+"Add TLS client certificate" button creates the device private key (save to file with name "kaadevkey") and certificate (save to file with name "kaadevcert"). For simplicity, we will connect with only the Root CA file. 
     
 ## **Configure the device**
           
-The IoT design kit comes with the Firmware pre-installed only for the Azure platform. To enable the possiblility to connect to the KaaIoT platform the fiwmware has to be updated to the latest from this repository. 
-
-In this step, the device will be configured to be able to connect to the KaaIoT
+In this step, the device will be configured to be able to connect to the Kaa IoT platform.
           
-- Ensure that all the four boards are stacked up correctly with the Adafruit FeatherWing OLED on the top.
+- Make sure to stack all four boards correctly, placing the Adafruit FeatherWing OLED on top.
           
 - Power up the IoT design kit stack via USB or a Li-Po connector on the Adafruit M0 Feather board.
           
 ![power-up](images/power-up.jpg)
 
-- Compile and upload the latest firmware to the IOT design kit. For example via Visual Studio Code and Platform IO. Restart the device.
+- Compile and upload the latest firmware to the IOT design kit. For instance, you can use Visual Studio Code and PlatformIO. Restart the device.
 
-- After a short initialization process, the device checks the existence if **platform.json** file, that contains the information about selected platform (because after the update the device supports 2 IOT platforms: Azure and KaaIoT). File doesn't not exist and it is created with default platform KaaIoT. 
+- After a short initialization process, the device checks the existence of a **platform.json** file. The file contains information about the selected platform because, after the update, the device supports 2 IoT platforms: Azure and Kaa Cloud. The file doesn't exist, and it is created with the default platform as Kaa. 
 
   ![Platform not configured](images/device-platform-not-configured.png)
 
-- Next the device looks for KaaIoT config file **kaadevconf.json**. This file also is absent during the first start and will be created later during the device configuration.
+- Next, the device looks for the Kaa config file, **kaadevconf.json**. The file is initially absent and will be created later during the configuration process.
 
   ![Kaaiot config not found](images/kaaiot-config-not-found.png)
 
-- The device configuration will be through the web interface. The main web menu file is index.html. To add the KaaIoT platform this file will be overwritten and orignal file will be created as index_src.html to backup it.
+- The web interface will be used to configure the device. The main web menu file is index.html. This file will be overwritten to add the Kaa IoT platform, and the original file will be saved as index_src.html for backup.
 
   ![index_src not exist](images/kaaiot-index_src_not-exist.png) 
 
   ![index_src created](images/kaaiot-index_src_created.png)
 
-- After that device informs that the IoT platform not configured and is waiting for the user to start the configuration process. 
+- After that, the device will inform you that the IoT platform is not configured and will wait for you to start the configuration process. 
 
   ![Platform not configured](images/iot-platform-not-configured.png)
 
-- Next the following message appears on the display "Device not configured. To configure double press button C". To switch platform long press on button B (the platform.json file will be changed and after the restart the device starts with another platform selected).
+- Next, the following message appears on the display: "Device not configured. To configure, double-press button C". To switch platforms, long-press on button B. The platform.json file will be changed, and after the restart, the device starts with another platform selected.
             
-- Double press button C on the OLED display FeatherWing to enter the configuration mode.
+- Double-press button C on the OLED display FeatherWing to enter the configuration mode.
 
   ![Wait To Config](images/WaitToConfig.png)        
               
-- In the configuration mode, perform the following five steps,
+- In the configuration mode, perform the following steps.
 
   ![Config Mode](images/configMode.png)
   
-  a. In the configuration mode, the Calypso Wi-Fi module is set to access point mode with an SSID "calypso_<MAC_ADDRESS>" and password "calypsowlan". Connect your PC (Laptop/tablet/smartphone) to this access point, displayed on the screen.
+  a.  In the configuration mode, the Calypso Wi-Fi module is set to access point mode with an SSID **"calypso_<MAC_ADDRESS>"** and password **"calypsowlan"**. Connect your PC (Laptop/tablet/smartphone) to this access point displayed on the screen.
 
 ![Connect to AP](images/connect-to-ap.png)  
 
-  b. On the PC open a browser.
+  b. On the PC, open a browser.
               
   c. In the browser, navigate to [calypso.net](calypso.net). Press on the left menu.                     
 
@@ -108,13 +110,13 @@ In this step, the device will be configured to be able to connect to the KaaIoT
 
   ![KaaIoT main menu](images/kaaiot-config-menu.png) 
 
-  e. Fill the fields. Click on the "Choose Files" button. This opens the file browser. Browse to the location where the configuration files are. Select Root CA file (kaarootca). Click on "Upload" button. It uploads the configuration and files. 
+  e. Fill in the fields. Click the "Choose Files" button to open the file browser. Navigate to the location where the configuration files are. Select the Root CA file (kaarootca). Click on the "Upload" button. It uploads the configuration and files. 
 
   ![KaaIoT select certificate](images/kaaiot-select-certificate.png)
 
   ![KaaIoT fill configuration](images/kaaiot-fill-configuration.png)
 
-  f. On success, the message "Success: 204 No content" at the bottom of the page indicates successful configuration of the device.
+  f. If successful, the message "Success: 204 No content" at the bottom of the page will indicate the successful configuration of the device.
 
   ![KaaIoT upload success](images/kaaiot-upload-success.png)
  
@@ -122,7 +124,7 @@ In this step, the device will be configured to be able to connect to the KaaIoT
               
   ![Reset](images/reset.jpg)
                   
-- On restarting, the device goes through the following steps automatically,
+- On restarting, the device goes through the following steps automatically:
               
   a. Initialize the hardware.
 
@@ -142,22 +144,22 @@ In this step, the device will be configured to be able to connect to the KaaIoT
 
   ![KaaIoT SNTP sync](images/kaaiot-sntp-sync.png)
               
-  d. The device connects securely to the KaaIoT platform and starts exchange of data.
+  d. The device connects securely to the Kaa IoT platform and starts exchange of data.
 
   ![KaaIoT connect to platform](images/kaaiot-connect-to-platform.png)
   ![KaaIoT connected](images/kaaiot-connected.png)
               
-At this stage, the device is fully configured, securely connected and ready to use. On subsequent boot-up the device directly connects to the platform using the saved address and starts exchanging data with the platform.
+During the subsequent boot-up, the device directly connects to the platform using the saved address and starts exchanging data with the platform.
              
 ![KaaIoT send data](images/kaaiot-send-data.png)             
 
-Connect the PC to the Internet by reconnect to the your local Wi-Fi network.
+Connect the PC to the Internet by reconnecting to your local Wi-Fi network.
 
-**Congratulations!** The set-up is now complete. It's not time to check the telemetry data on the cloud.
+**Congratulations!** The setup is now complete, and it's time to check the telemetry data on the cloud.
 
-## **View and interact with device on the KaaIoT platform**
+## **View and interact with device on the Kaa IoT platform**
 
-To access the device on the KaaIoT platform, navigate to "Devices -> Wurth application -> <Endpoint ID>".
+To access the device on the Kaa IoT platform, navigate to "Devices -> Wurth application -> <Endpoint ID>".
 
 ![KaaIoT endpoint](images/kaaiot-endpoint.png)
  
@@ -167,17 +169,14 @@ In order to send a command to the device, click on the commands tab on the devic
 
 ![KaaIoT command on](images/kaaiot-command-on.png)
 
-Click on Run. 
-
-The message is processed by the device, the device show the command state on the display and send response.
+Click on Run. The message is processed by the device, which shows the command state on the display and sends a response.
   
 ![KaaIoT device receive command](images/kaaiot-device-command-on.png)  
 
-KaaIoT platform show that command was executed.
+The Kaa IoT platform shows that command was executed.
 
 ![KaaIoT command executed](images/kaaiot-command-executed.png)
 
 ## **Factory resetting the device**
 
-In order to reset the device to factory state, press the "button C" once, then Press and hold "button C" till the following message is displayed on the screen, "Reset device to factory state". 
-This procedure resets the device to default state. Follow the device configuration process defined earlier to reconfigure the device.
+To reset the device to factory state, press button C once, then press and hold button C till the following message is displayed on the screen: "Reset device to factory state". This procedure resets the device to its default state. Follow the device configuration process defined earlier to reconfigure the device.
