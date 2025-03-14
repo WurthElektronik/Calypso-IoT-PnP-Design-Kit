@@ -210,7 +210,7 @@ static bool Device_loadConfiguration()
     calypso->settings.mqttSettings.serverInfo.port = MQTT_PORT_SECURE;
 
     calypso->settings.mqttSettings.secParams.securityMethod = ATMQTT_SECURITY_METHOD_TLSV1_2;
-    calypso->settings.mqttSettings.secParams.cipher = ATMQTT_CIPHER_TLS_RSA_WITH_AES_256_CBC_SHA;
+    calypso->settings.mqttSettings.secParams.cipher = ATMQTT_CIPHER_TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA;
     strcpy(calypso->settings.mqttSettings.secParams.CAFile, KAAIOT_ROOT_CA_PATH);
     if (Calypso_fileExists(calypso, KAAIOT_DEVICE_CERT_PATH))
     {
