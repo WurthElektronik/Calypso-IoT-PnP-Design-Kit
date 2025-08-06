@@ -1,3 +1,0 @@
-# Arduino platform
-
-# Base platform

@@ -1,51 +1,26 @@
 {
 	"folders": [
 		{
-			"path": "GW"
-		},
-		{
-			"path": "Common"
+			"path": "."
 		}
 	],
 	"settings": {
-		"editor.formatOnSave": true,
-		"editor.formatOnType": true,
 		"files.associations": {
-			"limits": "cpp",
-			"typeinfo": "cpp",
-			"random": "c",
-			"calypso.h": "c",
-			"xlocale": "c",
-			"xstring": "c",
-			"string_view": "c",
-			"array": "c",
-			"vector": "c",
-			"xutility": "c",
-			"string": "c",
-			"functional": "c",
-			"optional": "c",
-			"system_error": "c",
-			"type_traits": "c",
-			"xtr1common": "c",
-			"istream": "c",
-			"ostream": "c",
-			"tuple": "c",
-			"utility": "c",
-			"atecc608a.h": "c",
-			"*.tcc": "c",
-			"cmath": "c",
-			"numeric": "c",
-			"cinttypes": "c",
-			"cstdlib": "c",
+			"wsen_hids_2525020210001.h": "c",
+			"wesensorssdk.h": "c",
+			"wsen_itds_2533020201601.h": "c",
+			"string": "cpp",
+			"global_types.h": "c",
+			"global.h": "c",
+			"wsen_tids_2521020222501.h": "c",
+			"time.h": "c",
 			"json-builder.h": "c",
-			"cstdio": "c",
-			"deque": "cpp",
-			"unordered_map": "cpp",
-			"initializer_list": "cpp",
-			"memory": "c",
-			"pnp_device.h": "c",
-			"sstream": "c",
-			"streambuf": "c"
+			"device.h": "c",
+			"string_view": "c",
+			"calypsoboard.h": "c",
+			"configplatform.h": "c",
+			"debug.h": "c",
+			"kaaiot.h": "c"
 		}
 	}
 }

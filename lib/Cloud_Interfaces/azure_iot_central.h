@@ -1,0 +1,78 @@
+/**
+ * \file
+ * \brief API implementation for the Azure IoT Central.
+ *
+ * \copyright (c) 2025 Würth Elektronik eiSos GmbH & Co. KG
+ *
+ * \page License
+ *
+ * THE SOFTWARE INCLUDING THE SOURCE CODE IS PROVIDED “AS IS”. YOU ACKNOWLEDGE THAT WÜRTH ELEKTRONIK
+ * EISOS MAKES NO REPRESENTATIONS AND WARRANTIES OF ANY KIND RELATED TO, BUT NOT LIMITED
+ * TO THE NON-INFRINGEMENT OF THIRD PARTIES’ INTELLECTUAL PROPERTY RIGHTS OR THE
+ * MERCHANTABILITY OR FITNESS FOR YOUR INTENDED PURPOSE OR USAGE. WÜRTH ELEKTRONIK EISOS DOES NOT
+ * WARRANT OR REPRESENT THAT ANY LICENSE, EITHER EXPRESS OR IMPLIED, IS GRANTED UNDER ANY PATENT
+ * RIGHT, COPYRIGHT, MASK WORK RIGHT, OR OTHER INTELLECTUAL PROPERTY RIGHT RELATING TO ANY
+ * COMBINATION, MACHINE, OR PROCESS IN WHICH THE PRODUCT IS USED. INFORMATION PUBLISHED BY
+ * WÜRTH ELEKTRONIK EISOS REGARDING THIRD-PARTY PRODUCTS OR SERVICES DOES NOT CONSTITUTE A LICENSE
+ * FROM WÜRTH ELEKTRONIK EISOS TO USE SUCH PRODUCTS OR SERVICES OR A WARRANTY OR ENDORSEMENT
+ * THEREOF
+ *
+ * THIS SOURCE CODE IS PROTECTED BY A LICENSE.
+ * FOR MORE INFORMATION PLEASE CAREFULLY READ THE LICENSE AGREEMENT FILE LOCATED
+ * IN THE ROOT DIRECTORY OF THIS PACKAGE
+ */
+
+
+#ifndef AZURE_IOT_CENTRAL_H
+#define AZURE_IOT_CENTRAL_H
+ #include <string.h>
+
+#include "json-builder.h"
+#include "device.h"
+#include "calypsoBoard.h"
+
+#ifdef __cplusplus
+extern "C"
+{
+#endif
+
+/*MQTT settings*/
+#define AZURE_DPS_SERVER_ADDRESS "global.azure-devices-provisioning.net"
+
+#define AZURE_MQTT_CIPHER "TLS_RSA_WITH_AES_256_CBC_SHA256"
+#define AZURE_CLAIM_DURATION 180000
+
+// MQTT Topics
+#define AZURE_TWIN_DESIRED_PROP_RES_TOPIC "$iothub/twin/PATCH/properties/desired/#"
+#define AZURE_TWIN_RES_TOPIC "$iothub/twin/res/#"
+#define AZURE_DIRECT_METHOD_TOPIC "$iothub/methods/POST/#"
+#define AZURE_TWIN_MESSAGE_PATCH "$iothub/twin/PATCH/properties/reported/?$rid="
+#define AZURE_TWIN_GET_TOPIC "$iothub/twin/GET/?$rid="
+
+#define AZURE_PROVISIONING_RESP_TOPIC "$dps/registrations/res/#"
+#define AZURE_PROVISIONING_REG_REQ_TOPIC "$dps/registrations/PUT/iotdps-register/?$rid="
+#define AZURE_PROVISIONING_STATUS_REQ_TOPIC "$dps/registrations/GET/iotdps-get-operationstatus/?$rid="
+
+
+#define AZURE_STATUS_SUCCESS 200
+#define AZURE_STATUS_UPDATE_IN_PROGRESS 202
+#define AZURE_STATUS_SET_BY_DEV 203
+#define AZURE_STATUS_BAD_REQUEST 400
+#define AZURE_STATUS_EXCEPTION 500
+#define AZURE_STATUS_CLOUD_SUCCESS 204
+#define AZURE_STATUS_TOO_MANY_REQUESTS 429
+
+
+bool Azure_loadConfiguration(json_value *configuration, CALYPSO *calypso);
+bool Azure_deviceProvision(CALYPSO *calypso);
+void Azure_ProcessCloudMessage(json_value *cloudResponse, CALYPSO *calypso);
+void Azure_PublishProperties(CALYPSO *calypso);
+bool Azure_SubscribeToTopics(CALYPSO *calypso);
+void Azure_setUserName(CALYPSO *calypso);
+
+
+#ifdef __cplusplus
+}
+#endif
+
+#endif /* AZURE_IOT_CENTRAL_H */
