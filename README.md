@@ -1,4 +1,4 @@
-#  How to create an demo IoT application using the Calypso IoT design kit with Azure IoT Central?
+#  How to create an demo IoT application using the Calypso IoT design kit?
 This guide will take you through the process of unboxing the Calypso IoT design kit, configuring it and finally sending sensor data to the IoT platform of your choice.
 
 This is a quick start guide intended to get the kit operational in quick time.
